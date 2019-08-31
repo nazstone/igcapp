@@ -23,11 +23,11 @@ class IpcMain {
           await addTrace(lastData); // eslint-disable-line
 
           // notification progress
-          event.reply('addIgcFileProgress', {
-            index: i,
-            length: data.filePaths.length,
-          });
           i += 1;
+          event.reply('addIgcFileProgress', {
+            done: i,
+            total: data.filePaths.length,
+          });
         }
       }
 

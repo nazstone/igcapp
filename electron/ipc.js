@@ -1,4 +1,4 @@
-const IGCAnalyzer = require('igc-analyzer');
+const IGCAnalyzer = require('./igc');
 const fs = require('fs');
 
 const {

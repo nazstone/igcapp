@@ -1,6 +1,7 @@
 const Umzug = require('umzug');
 const path = require('path');
 const sha1 = require('sha1');
+const moment = require('moment');
 
 const db = require('./db');
 
@@ -33,8 +34,14 @@ const start = () => new Promise((res, rej) => {
 });
 
 const addTrace = async (data) => {
+  // todo transform data to json
   const str = JSON.stringify(data);
   const hash = sha1(str);
+
+  let date = new Date();
+  if (data.metadata.date) {
+    date = moment(data.metadata.date, 'DDMMYY').format();
+  }
 
   await db.trace.findOrCreate({
     where: {
@@ -43,7 +50,7 @@ const addTrace = async (data) => {
     defaults: {
       data: str,
       hash,
-      date: new Date(),
+      date,
     },
   });
 };

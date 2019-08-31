@@ -59,8 +59,18 @@ const getTraces = async (offset, limit) => {
   return data;
 };
 
+const getTraceLast = async () => {
+  const data = await db.trace.findOne({
+    order: [
+      'date',
+    ],
+  });
+  return data;
+};
+
 module.exports = {
   start,
   addTrace,
   getTraces,
+  getTraceLast,
 };

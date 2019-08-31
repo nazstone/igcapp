@@ -4,15 +4,16 @@ const {
 
 const path = require('path');
 const isDev = require('electron-is-dev');
-const IGCAnalyzer = require('igc-analyzer');
-const fs = require('fs');
 
-const { start, addTrace, getTraces } = require('./db/repo');
+const Ipc = require('./ipc');
+const { start } = require('./db/repo');
+
+const ipc = new Ipc();
 
 let mainWindow;
 
 const createWindow = async () => {
-  // create db
+  // create db and init
   await start();
 
   // create browser
@@ -49,10 +50,9 @@ app.on('activate', () => {
   }
 });
 
-ipcMain.on('getIgcFiles', async (event) => {
-  const results = await getTraces(0, 10);
-  event.reply('getIgcFilesResult', results.map((d) => d.toJSON()));
-});
+ipcMain.on('getIgcFiles', ipc.getTraces);
+
+ipcMain.on('getIgcLast', ipc.getTraceLast);
 
 ipcMain.on('addIgcFileAsk', (event) => {
   // dialog to upload
@@ -62,29 +62,5 @@ ipcMain.on('addIgcFileAsk', (event) => {
       { name: 'IGC', extensions: ['igc'] },
     ],
     properties: ['openFile', 'multiSelections'],
-  }).then(async (data) => {
-    // on result parse each file
-    let lastData;
-    if (data && data.filePaths && data.filePaths.length > 0) {
-      let i = 0;
-      // eslint-disable-next-line no-restricted-syntax
-      for (const filePathTmp of data.filePaths) {
-        // analyze and add in db
-        const igcData = fs.readFileSync(filePathTmp);
-        const analyzer = new IGCAnalyzer(igcData);
-        lastData = analyzer.parse(true, true);
-        await addTrace(lastData); // eslint-disable-line
-
-        // notification progress
-        event.reply('getIgcFileProgress', {
-          index: i,
-          length: data.filePaths.length,
-        });
-        i += 1;
-      }
-    }
-
-    // notification end
-    event.reply('getIgcFileResult', lastData);
-  });
+  }).then((d) => ipc.upload(event)(d));
 });

@@ -8,12 +8,22 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    ipcRenderer.on('addIgcFileAsk', (event, arg) => {
-      console.log(arg);
+    ipcRenderer.on('addIgcFileResult', (event, arg) => {
+      console.log('add file', arg);
+    });
+    ipcRenderer.on('addIgcFileProgress', (event, arg) => {
+      console.log('progress', arg);
     });
     ipcRenderer.on('getIgcFilesResult', (event, arg) => {
-      console.log(arg);
+      console.log('get files', arg);
     });
+    ipcRenderer.on('getIgcLastResult', (event, arg) => {
+      console.log('get last file', arg);
+    });
+  }
+
+  componentDidMount() {
+    ipcRenderer.send('getIgcLast');
   }
 
   getTraceClick() {

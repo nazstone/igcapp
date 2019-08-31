@@ -8,14 +8,20 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    ipcRenderer.on('getIgcFileResult', (event, arg) => {
+    ipcRenderer.on('addIgcFileAsk', (event, arg) => {
+      console.log(arg);
+    });
+    ipcRenderer.on('getIgcFilesResult', (event, arg) => {
       console.log(arg);
     });
   }
 
+  getTraceClick() {
+    ipcRenderer.send('getIgcFiles');
+  }
+
   addTraceClick() {
-    console.log('click trace add.', ipcRenderer);
-    ipcRenderer.send('getIgcFileAsk');
+    ipcRenderer.send('addIgcFileAsk');
   }
 
   render() {
@@ -26,6 +32,7 @@ class App extends React.Component {
         </header>
         <div>
           <button type="button" onClick={() => this.addTraceClick()}>Add trace</button>
+          <button type="button" onClick={() => this.getTraceClick()}>Get trace</button>
         </div>
       </div>
     );

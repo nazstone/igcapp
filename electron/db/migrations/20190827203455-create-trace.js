@@ -1,37 +1,11 @@
+
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: (queryInterface, Sequelize, model) => {
     console.info('migration create trace');
-    return queryInterface.createTable('Traces', {
-      id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      data: {
-        type: Sequelize.JSON,
-      },
-      date: {
-        type: Sequelize.DATE,
-      },
-      description: {
-        type: Sequelize.TEXT,
-      },
-      hash: {
-        type: Sequelize.TEXT,
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-      },
-    });
+    return queryInterface.createTable(model.trace.tableName, model.trace.tableAttributes);
   },
   down: (queryInterface) => {
     console.info('migration delete trace');
-    return queryInterface.dropTable('Traces');
+    return queryInterface.dropTable('Trace');
   },
 };

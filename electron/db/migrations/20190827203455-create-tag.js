@@ -1,11 +1,11 @@
 
 module.exports = {
-  up: (queryInterface, Sequelize, model) => {
+  up: (queryInterface, _, model) => {
     console.info('migration create tags');
     return queryInterface.createTable(model.tag.tableName, model.tag.tableAttributes);
   },
-  down: (queryInterface) => {
+  down: (queryInterface, _, model) => {
     console.info('migration delete tags');
-    return queryInterface.dropTable('Tags');
+    return queryInterface.dropTable(model.tag.tableName);
   },
 };

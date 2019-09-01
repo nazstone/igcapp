@@ -8,8 +8,18 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
+    // define the state
+    this.state = {
+      trace: {},
+    };
+
+    // listener on ipc render
     ipcRenderer.on('addIgcFileResult', (event, arg) => {
       console.log('add file', arg);
+      this.setState((prevState) => ({
+        ...prevState,
+        trace: arg,
+      }));
     });
     ipcRenderer.on('addIgcFileProgress', (event, arg) => {
       console.log('progress', arg);
@@ -19,6 +29,10 @@ class App extends React.Component {
     });
     ipcRenderer.on('getIgcLastResult', (event, arg) => {
       console.log('get last file', arg);
+      this.setState((prevState) => ({
+        ...prevState,
+        trace: arg,
+      }));
     });
   }
 
@@ -35,6 +49,11 @@ class App extends React.Component {
   }
 
   render() {
+    let data;
+    // eslint-disablne-next-line
+    if (this.state.trace && this.state.trace.data) {
+      data = this.state.trace.data.metadata['instrument-name'];
+    }
     return (
       <div className={style.App}>
         <header className={style.AppHeader}>
@@ -44,6 +63,7 @@ class App extends React.Component {
           <button type="button" onClick={() => this.addTraceClick()}>Add trace</button>
           <button type="button" onClick={() => this.getTraceClick()}>Get trace</button>
         </div>
+        <div>Metadata: {data}</div>
       </div>
     );
   }

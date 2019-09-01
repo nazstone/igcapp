@@ -1,5 +1,5 @@
-const IGCAnalyzer = require('./igc');
 const fs = require('fs');
+const IGCAnalyzer = require('./igc');
 
 const {
   addTrace,
@@ -44,7 +44,11 @@ class IpcMain {
 
   async getTraceLast(event) {
     const result = await getTraceLast();
-    event.reply('getIgcLastResult', result ? result.dataValues : null);
+    const data = result && {
+      ...result.dataValues,
+      data: JSON.parse(result.dataValues.data),
+    };
+    event.reply('getIgcLastResult', data);
   }
 }
 

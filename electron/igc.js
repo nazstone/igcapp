@@ -1,6 +1,7 @@
 const ss = require('simple-statistics');
 const _ = require('lodash');
 
+/* eslint-disable*/
 module.exports = class IGCAnalyzer {
   constructor(igcData) {
     this.config = {

@@ -52,7 +52,7 @@
 		"postinstall": "electron-builder install-app-deps",
 		"preelectron-pack": "npm run build",
 		"electron-pack": "electron-builder",
-		"eslint": "eslint src public"
+		"eslint": "eslint src electron"
 	},
 	"build": {
 		"appId": "org.nazstone",

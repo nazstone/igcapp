@@ -1,5 +1,6 @@
 import React from 'react';
 import style from './App.module.scss';
+import Metadata from './metadata/metadata';
 
 // eslint-disable-next-line no-undef
 const { ipcRenderer } = window.require('electron');
@@ -49,21 +50,31 @@ class App extends React.Component {
   }
 
   render() {
-    let data;
-    // eslint-disablne-next-line
-    if (this.state.trace && this.state.trace.data) {
-      data = this.state.trace.data.metadata['instrument-name'];
+    const { trace } = this.state;
+    let metadataCompo;
+    if (trace && trace.data && trace.data.metadata) {
+      metadataCompo = <Metadata metadata={trace.data.metadata} />;
+    } else {
+      return (<div />);
     }
     return (
       <div className={style.App}>
-        <header className={style.AppHeader}>
-          Welcome to your trace viewer
-        </header>
-        <div>
+        <div className={style.header}>
+          <div className={style.title}>IGC APP</div>
           <button type="button" onClick={() => this.addTraceClick()}>Add trace</button>
           <button type="button" onClick={() => this.getTraceClick()}>Get trace</button>
         </div>
-        <div>Metadata: {data}</div>
+        <div className={style.northLayout}>
+          <div className={style.left}>
+            {metadataCompo}
+          </div>
+          <div className={style.right}>
+            Plot trace
+          </div>
+        </div>
+        <div className={style.southLayout}>
+          Beautiful map
+        </div>
       </div>
     );
   }

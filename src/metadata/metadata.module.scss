@@ -1,0 +1,10 @@
+.all {
+  display: flex;
+  flex-direction: column;
+}
+.metadataLine {
+  display: flex;
+  div {
+    padding: 0.2em;
+  }
+}

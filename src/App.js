@@ -1,6 +1,8 @@
 import React from 'react';
+
 import style from './App.module.scss';
-import Metadata from './metadata/metadata';
+import Metadata from './info/metadataInfo';
+import MapWithTrace from './map/mapWithTrace';
 
 // eslint-disable-next-line no-undef
 const { ipcRenderer } = window.require('electron');
@@ -73,7 +75,7 @@ class App extends React.Component {
           </div>
         </div>
         <div className={style.southLayout}>
-          Beautiful map
+          <MapWithTrace points={trace.data.fixes} />
         </div>
       </div>
     );

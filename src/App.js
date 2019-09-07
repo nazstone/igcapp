@@ -1,8 +1,9 @@
 import React from 'react';
 
 import style from './App.module.scss';
-import Metadata from './info/metadataInfo';
+
 import MapWithTrace from './map/mapWithTrace';
+import Info from './info';
 
 // eslint-disable-next-line no-undef
 const { ipcRenderer } = window.require('electron');
@@ -53,12 +54,7 @@ class App extends React.Component {
 
   render() {
     const { trace } = this.state;
-    let metadataCompo;
-    if (trace && trace.data && trace.data.metadata) {
-      metadataCompo = <Metadata metadata={trace.data.metadata} />;
-    } else {
-      return (<div />);
-    }
+
     return (
       <div className={style.App}>
         <div className={style.header}>
@@ -68,14 +64,19 @@ class App extends React.Component {
         </div>
         <div className={style.northLayout}>
           <div className={style.left}>
-            {metadataCompo}
+            <Info trace={trace} />
           </div>
           <div className={style.right}>
             Plot trace
           </div>
         </div>
         <div className={style.southLayout}>
-          <MapWithTrace points={trace.data.fixes} />
+          {
+            trace
+              && trace.data
+              && trace.data.fixes
+              && <MapWithTrace points={trace.data.fixes} />
+          }
         </div>
       </div>
     );

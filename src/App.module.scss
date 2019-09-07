@@ -18,6 +18,7 @@
   .northLayout {
     display: flex;
     flex: 2;
+    // padding: 0.5rem;
 
     .right {
       flex: 1;
@@ -35,6 +36,5 @@
     display: flex;
     flex: 5;
     position: relative;
-    background: orange;
   }
 }

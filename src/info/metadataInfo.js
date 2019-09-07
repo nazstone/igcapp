@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withTranslation } from 'react-i18next';
 
 import style from './metadataInfo.module.scss';
+import './info.scss';
 
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -21,24 +22,24 @@ class Metadata extends React.Component {
     const metadatas = [];
     const { metadata } = this.props;
     if (metadata) {
-      // eslint-disable-next-line no-restricted-syntax
-      for (const key of Object.keys(metadata)) {
-        if (!metadata[key]) {
+      // eslint-disable-next-line
+      for (const keyTmp of Object.keys(metadata)) {
+        if (!metadata[keyTmp]) {
           // eslint-disable-next-line no-continue
           continue;
         }
-        const val = metadata[key];
-        const keyTr = this.props.t(`metadata_${key}`);
+        const val = metadata[keyTmp];
+        const keyTr = this.props.t(`metadata_${keyTmp}`);
         if (typeof val === 'string') {
           metadatas.push(
-            <div key={key} className={style.metadataLine}>
+            <div key={keyTmp} className="line">
               <div>{keyTr}:</div>
               <div>{val}</div>
             </div>,
           );
-        } else if (key === 'gps') {
+        } else if (keyTmp === 'gps') {
           metadatas.push(
-            <div key={key} className={style.metadataLine}>
+            <div key={keyTmp} className="line">
               <div>{keyTr}:</div>
               <div>Manufacturer: {val.manufacturer}</div>
               <div>Uid: {val.uid}</div>

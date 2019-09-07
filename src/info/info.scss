@@ -1,0 +1,13 @@
+
+.line {
+  display: flex;
+
+  div {
+    padding: 0.2em;
+  }
+
+  div:first-child { 
+    font-weight: bold;
+  }
+  
+}

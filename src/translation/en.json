@@ -1,5 +1,12 @@
 {
   "translation": {
+    "general_info_title_main": "Main",
+    "general_info_title_metadata": "Metadata",
+    "sumup_date": "Date",
+    "sumup_duration": "Duration",
+    "sumup_distance": "Distance",
+    "sumup_alt_min": "Alt min",
+    "sumup_alt_max": "Alt max",
     "metadata_date": "Date",
     "metadata_firmware-version": "Firmware version",
     "metadata_geodetic-datum": "Geodetic Datum",

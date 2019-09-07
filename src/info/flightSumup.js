@@ -27,7 +27,6 @@ class FlightSumup extends React.Component {
     if (!track) {
       return (<div />);
     }
-    console.log(track);
 
     return (
       <div className={style.parent}>

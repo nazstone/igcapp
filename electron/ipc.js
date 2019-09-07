@@ -14,7 +14,7 @@ class IpcMain {
       let lastData;
       if (data && data.filePaths && data.filePaths.length > 0) {
         let i = 0;
-        // eslint-disable-next-line no-restricted-syntax
+        // eslint-disable-next-line
         for (const filePathTmp of data.filePaths) {
           // analyze and add in db
           const igcData = fs.readFileSync(filePathTmp);

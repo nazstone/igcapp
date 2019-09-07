@@ -13,7 +13,6 @@ import classnames from 'classnames';
 import FlightSumup from './flightSumup';
 import Metadata from './metadataInfo';
 
-// eslint-disable-next-line react/prefer-stateless-function
 class Info extends React.Component {
   static propTypes = {
     trace: PropTypes.any, // eslint-disable-line react/forbid-prop-types

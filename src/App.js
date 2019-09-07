@@ -1,6 +1,10 @@
 import React from 'react';
+
 import style from './App.module.scss';
-import Metadata from './metadata/metadata';
+
+import MapWithTrace from './map/mapWithTrace';
+import Info from './info';
+import Header from './header';
 
 // eslint-disable-next-line no-undef
 const { ipcRenderer } = window.require('electron');
@@ -17,10 +21,12 @@ class App extends React.Component {
     // listener on ipc render
     ipcRenderer.on('addIgcFileResult', (event, arg) => {
       console.log('add file', arg);
-      this.setState((prevState) => ({
-        ...prevState,
-        trace: arg,
-      }));
+      if (arg) {
+        this.setState((prevState) => ({
+          ...prevState,
+          trace: arg,
+        }));
+      }
     });
     ipcRenderer.on('addIgcFileProgress', (event, arg) => {
       console.log('progress', arg);
@@ -45,35 +51,27 @@ class App extends React.Component {
     ipcRenderer.send('getIgcFiles');
   }
 
-  addTraceClick() {
-    ipcRenderer.send('addIgcFileAsk');
-  }
-
   render() {
     const { trace } = this.state;
-    let metadataCompo;
-    if (trace && trace.data && trace.data.metadata) {
-      metadataCompo = <Metadata metadata={trace.data.metadata} />;
-    } else {
-      return (<div />);
-    }
+
     return (
       <div className={style.App}>
-        <div className={style.header}>
-          <div className={style.title}>IGC APP</div>
-          <button type="button" onClick={() => this.addTraceClick()}>Add trace</button>
-          <button type="button" onClick={() => this.getTraceClick()}>Get trace</button>
-        </div>
+        <Header />
         <div className={style.northLayout}>
           <div className={style.left}>
-            {metadataCompo}
+            <Info trace={trace} />
           </div>
           <div className={style.right}>
             Plot trace
           </div>
         </div>
         <div className={style.southLayout}>
-          Beautiful map
+          {
+            trace
+              && trace.data
+              && trace.data.fixes
+              && <MapWithTrace points={trace.data.fixes} />
+          }
         </div>
       </div>
     );

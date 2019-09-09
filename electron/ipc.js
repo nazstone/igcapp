@@ -4,6 +4,7 @@ const IGCAnalyzer = require('./igc');
 const {
   addTrace,
   getTraces,
+  getTraceById,
   getTraceLast,
 } = require('./db/repo');
 
@@ -37,9 +38,21 @@ class IpcMain {
     return method;
   }
 
-  async getTraces(event) {
-    const results = await getTraces(0, 10);
-    event.reply('getIgcFilesResult', results.map((d) => d.toJSON()));
+  async getTraces(event, args) {
+    const results = await getTraces(args.page, (args.page + 1) * args.sizePerPage);
+    event.reply('getIgcFilesResult', {
+      count: results.count,
+      rows: results.rows.map((d) => d.toJSON()),
+    });
+  }
+
+  async getTraceById(event, args) {
+    const result = await getTraceById(args.id);
+    const data = result && {
+      ...result.dataValues,
+      data: JSON.parse(result.dataValues.data),
+    };
+    event.reply('selectedIgcResult', data);
   }
 
   async getTraceLast(event) {
@@ -48,7 +61,7 @@ class IpcMain {
       ...result.dataValues,
       data: JSON.parse(result.dataValues.data),
     };
-    event.reply('getIgcLastResult', data);
+    event.reply('selectedIgcResult', data);
   }
 }
 

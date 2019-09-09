@@ -9,10 +9,20 @@ import {
   Nav,
   NavItem,
   NavLink,
+  Modal,
+  ModalBody,
+  ModalHeader,
 } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlusCircle, faSearch, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPlusCircle,
+  faSearch,
+  faPaperPlane,
+} from '@fortawesome/free-solid-svg-icons';
 
+
+import style from './header.module.scss';
+import SearchTrace from './search/search.trace';
 
 // eslint-disable-next-line no-undef
 const { ipcRenderer } = window.require('electron');
@@ -25,17 +35,39 @@ class Header extends React.Component {
   static defaultProps = {
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      searchOpen: false,
+    };
+  }
+
   addTraceClick() {
-    console.log('tada');
     ipcRenderer.send('addIgcFileAsk');
+  }
+
+  searchDisplayModal() {
+    this.setState((pvSt) => ({
+      ...pvSt,
+      resultDisplay: true,
+    }));
+  }
+
+  searchHideModal() {
+    this.setState((pvSt) => ({
+      ...pvSt,
+      resultDisplay: false,
+    }));
   }
 
   render() {
     const { t } = this.props;
 
     return (
-      <Navbar color="light" light expand="md">
-        <NavbarBrand href="/">{t('header_title')}</NavbarBrand>
+      <Navbar color="light" light expand="lg">
+        <FontAwesomeIcon icon={faPaperPlane} size="lg" />
+        <NavbarBrand href="#" className={style.title}>{t('header_title')}</NavbarBrand>
         <NavbarToggler onClick={this.toggle} />
         <Collapse isOpen navbar>
           <Nav className="ml-auto" navbar>
@@ -46,16 +78,17 @@ class Header extends React.Component {
             </NavItem>
             <NavItem>
               <NavLink href="#">
-                <FontAwesomeIcon icon={faSearch} size="lg" />
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="#">
-                <FontAwesomeIcon icon={faEllipsisH} size="lg" />
+                <FontAwesomeIcon icon={faSearch} size="lg" onClick={() => this.searchDisplayModal()} />
               </NavLink>
             </NavItem>
           </Nav>
         </Collapse>
+        <Modal isOpen={this.state.resultDisplay} backdrop toggle={() => this.searchHideModal()}>
+          <ModalHeader toggle={() => this.searchHideModal()}>{t('header_title_search')}</ModalHeader>
+          <ModalBody>
+            <SearchTrace hide={() => this.searchHideModal()} />
+          </ModalBody>
+        </Modal>
       </Navbar>
     );
   }

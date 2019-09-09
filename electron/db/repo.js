@@ -56,7 +56,7 @@ const addTrace = async (data) => {
 };
 
 const getTraces = async (offset, limit) => {
-  const data = await db.trace.findAll({
+  const data = await db.trace.findAndCountAll({
     attributes: {
       exclude: ['data'],
     },
@@ -75,9 +75,19 @@ const getTraceLast = async () => {
   return data;
 };
 
+const getTraceById = async (id) => {
+  const data = await db.trace.findOne({
+    where: {
+      id,
+    },
+  });
+  return data;
+};
+
 module.exports = {
   start,
   addTrace,
   getTraces,
+  getTraceById,
   getTraceLast,
 };

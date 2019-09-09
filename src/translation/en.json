@@ -1,6 +1,7 @@
 {
   "translation": {
     "header_title": "IgcApp",
+    "header_title_search": "Search",
     "general_info_title_main": "Main",
     "general_info_title_metadata": "Metadata",
     "sumup_date": "Date",
@@ -14,6 +15,8 @@
     "metadata_gps": "GPS",
     "metadata_hardware-version": "Hardware version",
     "metadata_instrument-name": "Instrument name",
-    "metadata_pressure-sensor": "Pressure sensor"
+    "metadata_pressure-sensor": "Pressure sensor",
+    "search_column_date": "Date",
+    "search_column_tag": "Tag"
   }
 }

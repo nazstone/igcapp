@@ -4,7 +4,7 @@ import style from './App.module.scss';
 
 import MapWithTrace from './map/mapWithTrace';
 import Info from './info';
-import Header from './header';
+import Header from './header/header';
 
 // eslint-disable-next-line no-undef
 const { ipcRenderer } = window.require('electron');
@@ -20,7 +20,6 @@ class App extends React.Component {
 
     // listener on ipc render
     ipcRenderer.on('addIgcFileResult', (event, arg) => {
-      console.log('add file', arg);
       if (arg) {
         this.setState((prevState) => ({
           ...prevState,
@@ -31,11 +30,7 @@ class App extends React.Component {
     ipcRenderer.on('addIgcFileProgress', (event, arg) => {
       console.log('progress', arg);
     });
-    ipcRenderer.on('getIgcFilesResult', (event, arg) => {
-      console.log('get files', arg);
-    });
-    ipcRenderer.on('getIgcLastResult', (event, arg) => {
-      console.log('get last file', arg);
+    ipcRenderer.on('selectedIgcResult', (event, arg) => {
       this.setState((prevState) => ({
         ...prevState,
         trace: arg,
@@ -45,10 +40,6 @@ class App extends React.Component {
 
   componentDidMount() {
     ipcRenderer.send('getIgcLast');
-  }
-
-  getTraceClick() {
-    ipcRenderer.send('getIgcFiles');
   }
 
   render() {

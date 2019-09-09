@@ -56,6 +56,8 @@ ipcMain.on('getIgcFiles', ipc.getTraces);
 
 ipcMain.on('getIgcLast', ipc.getTraceLast);
 
+ipcMain.on('getIgcById', ipc.getTraceById);
+
 ipcMain.on('addIgcFileAsk', (event) => {
   // dialog to upload
   dialog.showOpenDialog({

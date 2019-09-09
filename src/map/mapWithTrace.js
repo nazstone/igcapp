@@ -45,7 +45,7 @@ export default class MapWithTrace extends React.Component {
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+          attribution="&copy; OpenStreetMap contributors"
         />
         <Marker position={position}>
           <Popup>A pretty CSS3 popup.<br />Easily customizable.</Popup>

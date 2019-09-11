@@ -56,7 +56,7 @@ const addTrace = async (data) => {
 };
 
 const getTraces = async (offset, limit) => {
-  const data = await db.trace.findAndCountAll({
+  const rows = await db.trace.findAll({
     attributes: {
       exclude: ['data'],
     },
@@ -66,7 +66,11 @@ const getTraces = async (offset, limit) => {
     offset,
     limit,
   });
-  return data;
+  const count = await db.trace.count();
+  return {
+    rows,
+    count,
+  };
 };
 
 const getTraceLast = async () => {

@@ -4,7 +4,7 @@ import { withTranslation } from 'react-i18next';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory, { PaginationProvider, PaginationListStandalone } from 'react-bootstrap-table2-paginator';
 
-
+import Tag from '../../tag/tag';
 import style from './search.trace.module.scss';
 
 const SIZE_PER_PAGE = 1;
@@ -133,9 +133,16 @@ class SearchTrace extends React.Component {
     }, {
       dataField: 'tags',
       text: t('search_column_tag'),
-      formatter: (_cell, row) => {
-        return <div>{row.tags.map((td) => (<div key={td.id}>{td.text}</div>))}</div>;
-      },
+      formatter: (_cell, row) => (
+        <div className="d-flex">{row.tags.map((td) => (
+          <Tag
+            key={td.id}
+            tag={td}
+          />
+        ))}
+        </div>
+      )
+      ,
     }];
 
     const rowEvents = {

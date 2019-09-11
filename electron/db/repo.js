@@ -60,6 +60,9 @@ const getTraces = async (offset, limit) => {
     attributes: {
       exclude: ['data'],
     },
+    include: [{
+      model: db.tag,
+    }],
     offset,
     limit,
   });
@@ -71,6 +74,9 @@ const getTraceLast = async () => {
     order: [
       'date',
     ],
+    include: [{
+      model: db.tag,
+    }],
   });
   return data;
 };
@@ -80,8 +86,29 @@ const getTraceById = async (id) => {
     where: {
       id,
     },
+    include: [{
+      model: db.tag,
+    }],
   });
   return data;
+};
+
+const removeTag = async (id) => {
+  // await db.tag.delete()
+  await db.tag.destroy({
+    where: {
+      id,
+    },
+  });
+};
+
+const addTag = async (text, traceId) => {
+  const t = await getTraceById(traceId);
+  const tag = await db.tag.create({
+    text,
+  });
+  tag.setTrace(t);
+  await tag.save();
 };
 
 module.exports = {
@@ -90,4 +117,6 @@ module.exports = {
   getTraces,
   getTraceById,
   getTraceLast,
+  addTag,
+  removeTag,
 };

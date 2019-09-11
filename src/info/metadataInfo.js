@@ -33,14 +33,14 @@ class Metadata extends React.Component {
         if (typeof val === 'string') {
           metadatas.push(
             <div key={keyTmp} className="line">
-              <div>{keyTr}:</div>
+              <div className="title">{keyTr}:</div>
               <div>{val}</div>
             </div>,
           );
         } else if (keyTmp === 'gps') {
           metadatas.push(
             <div key={keyTmp} className="line">
-              <div>{keyTr}:</div>
+              <div className="title">{keyTr}:</div>
               <div>Manufacturer: {val.manufacturer}</div>
               <div>Uid: {val.uid}</div>
             </div>,

@@ -1,4 +1,14 @@
 .parent {
   display: flex;
-  flex-direction: column
+  flex-direction: column;
+
+  .tags {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .plus {
+      margin-left: 0.5rem;
+    }
+  }
 }

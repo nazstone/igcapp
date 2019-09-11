@@ -68,7 +68,14 @@ class Info extends React.Component {
               trace
                 && trace.data
                 && trace.data.track
-                && <FlightSumup track={trace.data.track} date={trace.date} />
+                && (
+                <FlightSumup
+                  track={trace.data.track}
+                  date={trace.date}
+                  tags={trace.tags}
+                  traceId={trace.id}
+                />
+                )
             }
           </TabPane>
           <TabPane tabId="2">

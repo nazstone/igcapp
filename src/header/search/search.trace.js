@@ -131,8 +131,11 @@ class SearchTrace extends React.Component {
       dataField: 'date',
       text: t('search_column_date'),
     }, {
-      dataField: 'tag',
+      dataField: 'tags',
       text: t('search_column_tag'),
+      formatter: (_cell, row) => {
+        return <div>{row.tags.map((td) => (<div key={td.id}>{td.text}</div>))}</div>;
+      },
     }];
 
     const rowEvents = {

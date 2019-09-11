@@ -6,6 +6,8 @@
     "general_info_title_metadata": "Metadata",
     "sumup_date": "Date",
     "sumup_duration": "Duration",
+    "sumup_tag": "Tag",
+    "sumup_type_tag": "Type a tag",
     "sumup_distance": "Distance",
     "sumup_alt_min": "Alt min",
     "sumup_alt_max": "Alt max",

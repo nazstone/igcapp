@@ -5,10 +5,15 @@ const {
 const path = require('path');
 const isDev = require('electron-is-dev');
 
-const Ipc = require('./ipc');
+const {
+  newTag,
+  removeTagById,
+  traces,
+  traceById,
+  traceLast,
+  upload,
+} = require('./ipc');
 const { start } = require('./db/repo');
-
-const ipc = new Ipc();
 
 let mainWindow;
 
@@ -52,11 +57,15 @@ app.on('activate', () => {
   }
 });
 
-ipcMain.on('getIgcFiles', ipc.getTraces);
+ipcMain.on('getIgcFiles', traces);
 
-ipcMain.on('getIgcLast', ipc.getTraceLast);
+ipcMain.on('getIgcLast', traceLast);
 
-ipcMain.on('getIgcById', ipc.getTraceById);
+ipcMain.on('getIgcById', traceById);
+
+ipcMain.on('addNewTag', newTag);
+
+ipcMain.on('removeTagById', removeTagById);
 
 ipcMain.on('addIgcFileAsk', (event) => {
   // dialog to upload
@@ -66,5 +75,5 @@ ipcMain.on('addIgcFileAsk', (event) => {
       { name: 'IGC', extensions: ['igc'] },
     ],
     properties: ['openFile', 'multiSelections'],
-  }).then((d) => ipc.upload(event)(d));
+  }).then((d) => upload(event)(d));
 });

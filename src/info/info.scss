@@ -1,12 +1,13 @@
 
 .line {
   display: flex;
+  align-items: baseline;
 
   div {
     padding: 0.2em;
   }
 
-  div:first-child { 
+  .title { 
     font-weight: bold;
   }
   

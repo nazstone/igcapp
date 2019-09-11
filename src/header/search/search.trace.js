@@ -7,7 +7,7 @@ import paginationFactory, { PaginationProvider, PaginationListStandalone } from 
 import Tag from '../../tag/tag';
 import style from './search.trace.module.scss';
 
-const SIZE_PER_PAGE = 1;
+const SIZE_PER_PAGE = 10;
 
 const RemotePagination = ({
   data,

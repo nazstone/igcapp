@@ -2,6 +2,7 @@ import React from 'react';
 
 import style from './App.module.scss';
 
+import Flat from './plot/flat';
 import MapWithTrace from './map/mapWithTrace';
 import Info from './info';
 import Header from './header/header';
@@ -52,9 +53,16 @@ class App extends React.Component {
           <div className={style.left}>
             <Info trace={trace} />
           </div>
-          <div className={style.right}>
-            Plot trace
-          </div>
+          {
+            trace
+            && trace.data
+            && trace.data.fixes
+            && <Flat
+              className={style.right}
+              points={trace.data.fixes}
+              onClick={data => console.log(data)}
+            />
+          }
         </div>
         <div className={style.southLayout}>
           {

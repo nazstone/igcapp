@@ -17,6 +17,12 @@
     "metadata_instrument-name": "Instrument name",
     "metadata_pressure-sensor": "Pressure sensor",
     "search_column_date": "Date",
-    "search_column_tag": "Tag"
+    "search_column_tag": "Tag",
+    "plot_pressalt": "Altitude (pression)",
+    "plot_gpsalt": "Altitude (GPS)",
+    "plot_time": "Time",
+    "plot_lat": "Latitude",
+    "plot_lng": "Longitude",
+    "plot_speed": "Speed"
   }
 }

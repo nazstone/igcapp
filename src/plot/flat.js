@@ -1,10 +1,12 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { withTranslation } from 'react-i18next';
 import { Line } from 'react-chartjs-2';
 
-export default class flat extends React.Component {
+class Flat extends React.Component {
     static propTypes = {
         className: PropTypes.string,
+        t: PropTypes.func.isRequired,
 
         points: PropTypes.arrayOf(PropTypes.any),
 
@@ -21,10 +23,6 @@ export default class flat extends React.Component {
 
     constructor(props) {
         super(props);
-    
-        this.state = {
-            data: this.transformPointsToData(props.points),
-        };
 
         this.clickHandler = this.clickHandler.bind(this);
 
@@ -45,7 +43,7 @@ export default class flat extends React.Component {
             }),
             datasets: [
                 {
-                    label: 'Altitudes (pression)',
+                    label: this.props.t('plot_pressalt'),
                     fill: false,
                     lineTension: 1,
                     backgroundColor: 'rgba(204,255,204,0.4)',
@@ -66,7 +64,7 @@ export default class flat extends React.Component {
                     data: points.map(p => p.pressalt),
                 },
                 {
-                    label: 'Altitudes (GPS)',
+                    label: this.props.t('plot_gpsalt'),
                     fill: false,
                     lineTension: 1,
                     backgroundColor: 'rgba(75,192,192,0.4)',
@@ -94,11 +92,11 @@ export default class flat extends React.Component {
 
     tooltipTitleCallback(tooltipItem, data) {
         const { index } = tooltipItem[0];
-        return `Time : ${data.labels[index]}`;
+        return `${this.props.t('plot_time')} : ${data.labels[index]}`;
     }
 
     getPoint(index) {
-        if (index < 0 || index > this.state.data.length) return;
+        if (index < 0 || index > this.props.points.length) return;
 
         return this.props.points[index];
     }
@@ -112,21 +110,21 @@ export default class flat extends React.Component {
     tooltipBeforeLabelCallback(tooltipItem, data) {
         const point = this.getPoint(tooltipItem.index);
         const lines = [];
-        lines.push(`Altitude (pression) : ${point.pressalt.toFixed(2)}`)
-        lines.push(`Altitude (GPS) : ${point.gpsalt.toFixed(2)}`)
+        lines.push(`${this.props.t('plot_pressalt')} : ${point.pressalt.toFixed(2)}`)
+        lines.push(`${this.props.t('plot_gpsalt')} : ${point.gpsalt.toFixed(2)}`)
         return lines.reduce(this.reducer);
     }
 
     tooltipLabelCallback(tooltipItem, data) {
         const point = this.getPoint(tooltipItem.index);
-        return `Latitude : ${point.lat.toFixed(4)}`;
+        return `${this.props.t('plot_lat')} : ${point.lat.toFixed(4)}`;
     }
 
     tooltipAfterLabelCallback(tooltipItem, data) {
         const point = this.getPoint(tooltipItem.index);
         const lines = [];
-        lines.push(`Longitude : ${point.lng.toFixed(2)}`)
-        lines.push(`Speed : ${point.speed.toFixed(2)}`)
+        lines.push(`${this.props.t('plot_lng')} : ${point.lng.toFixed(2)}`)
+        lines.push(`${this.props.t('plot_speed')} : ${point.speed.toFixed(2)}`)
         return lines.reduce(this.reducer);
     }
 
@@ -134,7 +132,7 @@ export default class flat extends React.Component {
         if (!data || !data.length || data.length <= 0) return;
 
         const index = data[0]._index;
-        if (index < 0 || index > this.state.data.length) return;
+        if (index < 0 || index > this.props.points.length) return;
 
         const elementClicked = this.props.points[index];
 
@@ -142,7 +140,7 @@ export default class flat extends React.Component {
     }
 
     render() {
-        const { data } = this.state;
+        const data = this.transformPointsToData(this.props.points);
         return (
             <div className={this.props.className}>
                 {
@@ -175,3 +173,5 @@ export default class flat extends React.Component {
         );
     }
 }
+
+export default withTranslation()(Flat);

@@ -6,17 +6,9 @@
     "general_info_title_metadata": "Metadata",
     "sumup_date": "Date",
     "sumup_duration": "Duration",
-    "sumup_tag": "Tag",
-    "sumup_type_tag": "Type a tag",
     "sumup_distance": "Distance",
     "sumup_alt_min": "Alt min",
     "sumup_alt_max": "Alt max",
-    "flat_time": "Time",
-    "flat_alt_pres": "Altitude (pression)",
-    "flat_alt_gps": "Altitude (GPS)",
-    "flat_latitude": "Latitude",
-    "flat_longitude": "Longitude",
-    "flat_speed": "Speed",
     "metadata_date": "Date",
     "metadata_firmware-version": "Firmware version",
     "metadata_geodetic-datum": "Geodetic Datum",
@@ -25,6 +17,12 @@
     "metadata_instrument-name": "Instrument name",
     "metadata_pressure-sensor": "Pressure sensor",
     "search_column_date": "Date",
-    "search_column_tag": "Tag"
+    "search_column_tag": "Tag",
+    "plot_pressalt": "Altitude (pression)",
+    "plot_gpsalt": "Altitude (GPS)",
+    "plot_time": "Time",
+    "plot_lat": "Latitude",
+    "plot_lng": "Longitude",
+    "plot_speed": "Speed"
   }
 }

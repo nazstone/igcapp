@@ -1,72 +1,15 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Line } from 'react-chartjs-2';
 import { withTranslation } from 'react-i18next';
-
-
-const transformPointsToData = (points) => {
-  if (!points || !points.length || points.length <= 0 ) return [];
-
-  const data = {
-      labels: points.map(p => {
-          return `${(`0${p.time.h}`).slice(-2)}:${(`0${p.time.m}`).slice(-2)}:${(`0${p.time.s}`).slice(-2)}`;
-      }),
-      datasets: [
-          {
-              label: 'Altitudes (pression)',
-              fill: false,
-              lineTension: 1,
-              backgroundColor: 'rgba(204,255,204,0.4)',
-              borderColor: 'rgba(204,255,204,1)',
-              borderCapStyle: 'butt',
-              borderDash: [],
-              borderDashOffset: 0.0,
-              borderJoinStyle: 'miter',
-              pointBorderColor: 'rgba(204,255,204,1)',
-              pointBackgroundColor: '#fff',
-              pointBorderWidth: 1,
-              pointHoverRadius: 5,
-              pointHoverBackgroundColor: 'rgba(204,255,204,1)',
-              pointHoverBorderColor: 'rgba(220,220,220,1)',
-              pointHoverBorderWidth: 2,
-              pointRadius: 1,
-              pointHitRadius: 1,
-              data: points.map(p => p.pressalt),
-          },
-          {
-              label: 'Altitudes (GPS)',
-              fill: false,
-              lineTension: 1,
-              backgroundColor: 'rgba(75,192,192,0.4)',
-              borderColor: 'rgba(75,192,192,1)',
-              borderCapStyle: 'butt',
-              borderDash: [],
-              borderDashOffset: 0.0,
-              borderJoinStyle: 'miter',
-              pointBorderColor: 'rgba(75,192,192,1)',
-              pointBackgroundColor: '#fff',
-              pointBorderWidth: 1,
-              pointHoverRadius: 5,
-              pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-              pointHoverBorderColor: 'rgba(220,220,220,1)',
-              pointHoverBorderWidth: 2,
-              pointRadius: 1,
-              pointHitRadius: 1,
-              data: points.map(p => p.gpsalt),
-          },
-      ],
-  };
-
-  return data;
-};
+import { Line } from 'react-chartjs-2';
 
 class Flat extends React.Component {
     static propTypes = {
         className: PropTypes.string,
-        
-        points: PropTypes.arrayOf(PropTypes.any),
-        
         t: PropTypes.func.isRequired,
+
+        points: PropTypes.arrayOf(PropTypes.any),
+
         onClick: PropTypes.func,
     }
 
@@ -80,10 +23,6 @@ class Flat extends React.Component {
 
     constructor(props) {
         super(props);
-    
-        this.state = {
-            data: transformPointsToData(props.points),
-        };
 
         this.clickHandler = this.clickHandler.bind(this);
 
@@ -94,21 +33,70 @@ class Flat extends React.Component {
         this.tooltipLabelCallback = this.tooltipLabelCallback.bind(this);
         this.tooltipAfterLabelCallback = this.tooltipAfterLabelCallback.bind(this);
     }
+    
+    transformPointsToData(points) {
+        if (!points || !points.length || points.length <= 0 ) return [];
 
-    static getDerivedStateFromProps(nextProps, prevState) {
-      return {
-          ...prevState,
-          data: transformPointsToData(nextProps.points),
-      };
+        const data = {
+            labels: points.map(p => {
+                return `${(`0${p.time.h}`).slice(-2)}:${(`0${p.time.m}`).slice(-2)}:${(`0${p.time.s}`).slice(-2)}`;
+            }),
+            datasets: [
+                {
+                    label: this.props.t('plot_pressalt'),
+                    fill: false,
+                    lineTension: 1,
+                    backgroundColor: 'rgba(204,255,204,0.4)',
+                    borderColor: 'rgba(204,255,204,1)',
+                    borderCapStyle: 'butt',
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: 'miter',
+                    pointBorderColor: 'rgba(204,255,204,1)',
+                    pointBackgroundColor: '#fff',
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: 'rgba(204,255,204,1)',
+                    pointHoverBorderColor: 'rgba(220,220,220,1)',
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    pointHitRadius: 1,
+                    data: points.map(p => p.pressalt),
+                },
+                {
+                    label: this.props.t('plot_gpsalt'),
+                    fill: false,
+                    lineTension: 1,
+                    backgroundColor: 'rgba(75,192,192,0.4)',
+                    borderColor: 'rgba(75,192,192,1)',
+                    borderCapStyle: 'butt',
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: 'miter',
+                    pointBorderColor: 'rgba(75,192,192,1)',
+                    pointBackgroundColor: '#fff',
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+                    pointHoverBorderColor: 'rgba(220,220,220,1)',
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    pointHitRadius: 1,
+                    data: points.map(p => p.gpsalt),
+                },
+            ],
+        };
+
+        return data;
     }
 
     tooltipTitleCallback(tooltipItem, data) {
         const { index } = tooltipItem[0];
-        return `${this.props.t('flat_time')}: ${data.labels[index]}`;
+        return `${this.props.t('plot_time')} : ${data.labels[index]}`;
     }
 
     getPoint(index) {
-        if (index < 0 || index > this.state.data.length) return;
+        if (index < 0 || index > this.props.points.length) return;
 
         return this.props.points[index];
     }
@@ -122,21 +110,21 @@ class Flat extends React.Component {
     tooltipBeforeLabelCallback(tooltipItem, data) {
         const point = this.getPoint(tooltipItem.index);
         const lines = [];
-        lines.push(`${this.props.t('flat_alt_pres')} : ${point.pressalt.toFixed(2)}`)
-        lines.push(`${this.props.t('flat_alt_gps')} : ${point.gpsalt.toFixed(2)}`)
+        lines.push(`${this.props.t('plot_pressalt')} : ${point.pressalt.toFixed(2)}`)
+        lines.push(`${this.props.t('plot_gpsalt')} : ${point.gpsalt.toFixed(2)}`)
         return lines.reduce(this.reducer);
     }
 
     tooltipLabelCallback(tooltipItem, data) {
         const point = this.getPoint(tooltipItem.index);
-        return `${this.props.t('flat_latitude')} : ${point.lat.toFixed(4)}`;
+        return `${this.props.t('plot_lat')} : ${point.lat.toFixed(4)}`;
     }
 
     tooltipAfterLabelCallback(tooltipItem, data) {
         const point = this.getPoint(tooltipItem.index);
         const lines = [];
-        lines.push(`${this.props.t('flat_longitude')} : ${point.lng.toFixed(2)}`)
-        lines.push(`${this.props.t('flat_speed')} : ${point.speed.toFixed(2)}`)
+        lines.push(`${this.props.t('plot_lng')} : ${point.lng.toFixed(2)}`)
+        lines.push(`${this.props.t('plot_speed')} : ${point.speed.toFixed(2)}`)
         return lines.reduce(this.reducer);
     }
 
@@ -144,7 +132,7 @@ class Flat extends React.Component {
         if (!data || !data.length || data.length <= 0) return;
 
         const index = data[0]._index;
-        if (index < 0 || index > this.state.data.length) return;
+        if (index < 0 || index > this.props.points.length) return;
 
         const elementClicked = this.props.points[index];
 
@@ -152,7 +140,7 @@ class Flat extends React.Component {
     }
 
     render() {
-        const { data } = this.state;
+        const data = this.transformPointsToData(this.props.points);
         return (
             <div className={this.props.className}>
                 {

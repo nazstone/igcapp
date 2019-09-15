@@ -69,7 +69,7 @@ class FlightSumup extends React.Component {
           <div className="title">{t('sumup_filename')}:</div>
           <div>{this.props.file.filename}</div>
         </div>
-        <div className="line">{this.props.file.path}</div>
+        {/* <div className="line">{this.props.file.path}</div> */}
         <div className="line">
           <div className="title">{t('sumup_date')}:</div>
           <div>{moment(this.props.date, 'DDMMYY').format('DD MMM YY')}</div>

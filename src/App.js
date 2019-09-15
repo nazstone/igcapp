@@ -16,22 +16,17 @@ class App extends React.Component {
 
     // define the state
     this.state = {
-      trace: {},
+      trace: null,
     };
 
     // listener on ipc render
-    ipcRenderer.on('addIgcFileResult', (event, arg) => {
-      if (arg) {
-        this.setState((prevState) => ({
-          ...prevState,
-          trace: arg,
-        }));
+    ipcRenderer.on('openFileErr', (event, arg) => {
+      if (arg.err) {
+        console.log(arg);
       }
     });
-    ipcRenderer.on('addIgcFileProgress', (event, arg) => {
-      console.log('progress', arg);
-    });
-    ipcRenderer.on('selectedIgcResult', (event, arg) => {
+    ipcRenderer.on('openFileFinish', (event, arg) => {
+      console.log('data receive', arg);
       this.setState((prevState) => ({
         ...prevState,
         trace: arg,
@@ -46,6 +41,17 @@ class App extends React.Component {
   render() {
     const { trace } = this.state;
 
+    console.log('trace', trace);
+
+    if (!trace) {
+      return (
+        <div className={style.App}>
+          <Header />
+          No data - Click on add (Plus button)
+        </div>
+      )
+    }
+
     return (
       <div className={style.App}>
         <Header />
@@ -54,8 +60,7 @@ class App extends React.Component {
             <Info trace={trace} />
           </div>
           {
-            trace
-            && trace.data
+            trace.data
             && trace.data.fixes
             && <Flat
               className={style.right}
@@ -66,10 +71,9 @@ class App extends React.Component {
         </div>
         <div className={style.southLayout}>
           {
-            trace
-              && trace.data
-              && trace.data.fixes
-              && <MapWithTrace points={trace.data.fixes} />
+            trace.data
+            && trace.data.fixes
+            && <MapWithTrace points={trace.data.fixes} />
           }
         </div>
       </div>

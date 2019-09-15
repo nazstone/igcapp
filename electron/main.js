@@ -11,7 +11,7 @@ const {
   traces,
   traceById,
   traceLast,
-  upload,
+  openFile,
 } = require('./ipc');
 const { start } = require('./db/repo');
 
@@ -74,6 +74,6 @@ ipcMain.on('addIgcFileAsk', (event) => {
     filters: [
       { name: 'IGC', extensions: ['igc'] },
     ],
-    properties: ['openFile', 'multiSelections'],
-  }).then((d) => upload(event)(d));
+    properties: ['openFile'],
+  }).then((d) => openFile(event)(d));
 });

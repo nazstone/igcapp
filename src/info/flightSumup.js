@@ -66,14 +66,19 @@ class FlightSumup extends React.Component {
     return (
       <div className={style.parent}>
         <div className="line">
+          <div className="title">{t('sumup_filename')}:</div>
+          <div>{this.props.file.filename}</div>
+        </div>
+        <div className="line">{this.props.file.path}</div>
+        <div className="line">
           <div className="title">{t('sumup_date')}:</div>
-          <div>{moment(this.props.date).format('DD MMM YY')}</div>
+          <div>{moment(this.props.date, 'DDMMYY').format('DD MMM YY')}</div>
         </div>
         <div className="line">
           <div className="title">{t('sumup_duration')}:</div>
           <div>{moment.utc(track.duration * 1000).format('HH:mm:ss')}</div>
         </div>
-        <div className="line">
+        { traceId && <div className="line">
           <div className="title">{t('sumup_tag')}:</div>
           <div className={style.tags}>{
             tags.map((td) => (
@@ -114,7 +119,7 @@ class FlightSumup extends React.Component {
               )
             }
           </div>
-        </div>
+        </div>}
         <div className="line">
           <div className="title">{t('sumup_distance')}:</div>
           <div>{Math.round(track.distance)}</div>

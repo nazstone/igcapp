@@ -10,17 +10,14 @@ module.exports = (sequelize) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    data: {
-      type: Sequelize.DataTypes.JSON,
+    path: {
+      type: Sequelize.DataTypes.TEXT,
       allowNull: false,
     },
     date: {
       type: Sequelize.DataTypes.DATE,
     },
     hash: {
-      type: Sequelize.DataTypes.TEXT,
-    },
-    description: {
       type: Sequelize.DataTypes.TEXT,
     },
   }, {

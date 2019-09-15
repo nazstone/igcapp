@@ -1,14 +1,14 @@
 const Sequelize = require('sequelize');
 const path = require('path');
+const { app } = require('electron');
 
 const Trace = require('./model/trace');
 const Tag = require('./model/tag');
 
-console.log(path.join(__dirname, './database.sqlite'));
 const sequelize = new Sequelize({
   logging: false,
   dialect: 'sqlite',
-  storage: path.join(__dirname, './database.sqlite'),
+  storage: path.join(app.getPath('userData'), './database.sqlite'),
 });
 
 const db = {};

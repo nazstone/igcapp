@@ -1,4 +1,7 @@
 const fs = require('fs');
+const path = require('path');
+const sha1 = require('sha1');
+
 const IGCAnalyzer = require('./igc');
 
 const {
@@ -9,6 +12,23 @@ const {
   addTag,
   removeTag,
 } = require('./db/repo');
+
+const returnAnalyze = (filePath, lastData, event) => {
+  try {
+    const igcData = fs.readFileSync(filePath);
+    const filename = path.basename(filePath);
+    const analyzer = new IGCAnalyzer(igcData);
+    lastData = analyzer.parse(true, true);
+    event.reply('openFileFinish', {
+      path: filePath,
+      filename: filename,
+      data: lastData,
+      hash: sha1(igcData),
+    });
+  } catch (err) {
+    event.reply('openFileErr', err);
+  }
+};
 
 const mapEntityToJson = (r) => {
   const result = r;
@@ -28,37 +48,27 @@ const mapEntityToJson = (r) => {
   delete result.dataValues.updatedAt;
   return ({
     ...result.dataValues,
-    data: result.dataValues.data && JSON.parse(result.dataValues.data),
+    data,
     tags,
   });
 };
 
-const upload = (event) => {
+const openFile = (event) => {
   return async (data) => {
     // on result parse each file
     let lastData;
-    if (data && data.filePaths && data.filePaths.length > 0) {
-      let i = 0;
-      // eslint-disable-next-line
-      for (const filePathTmp of data.filePaths) {
-        // analyze and add in db
-        const igcData = fs.readFileSync(filePathTmp);
-        const analyzer = new IGCAnalyzer(igcData);
-        lastData = analyzer.parse(true, true);
-        await addTrace(lastData); // eslint-disable-line
-
-        // notification progress
-        i += 1;
-        event.reply('addIgcFileProgress', {
-          done: i,
-          total: data.filePaths.length,
-        });
-      }
+    // if (!data || !data.filePaths || data.filePaths.length === 0) {
+      if (!data || !data.filePaths || data.filePaths.length === 0) {
+      event.reply('openFileErr', {
+        err: 'empty filepath',
+      });
     }
-
-    // notification end
-    event.reply('addIgcFileResult', lastData);
+    returnAnalyze(data.filePaths[0], lastData, event);
   };
+};
+
+const saveTrace = async (date, hash, path) => {
+  await addTrace(date, hash, path);
 };
 
 const traces = async (event, args) => {
@@ -101,5 +111,7 @@ module.exports = {
   traces,
   traceById,
   traceLast,
-  upload,
+  openFile,
+  saveTrace,
 };
+

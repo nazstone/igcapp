@@ -16,7 +16,6 @@ class Tag extends React.Component {
     tag: PropTypes.any, // eslint-disable-line react/forbid-prop-types
     remove: PropTypes.bool,
     traceId: PropTypes.number,
-    t: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -34,7 +33,6 @@ class Tag extends React.Component {
 
   render() {
     const {
-      t,
       tag,
       remove,
       traceId,

@@ -14,3 +14,14 @@
 .table {
   table-layout: unset !important;
 }
+
+.save {
+  display: flex;
+  align-items: center;
+  background: lightgray;
+  margin-right: 2rem;
+
+  .button {
+    margin-left: 0.3rem;
+  }
+}

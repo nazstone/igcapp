@@ -52,7 +52,21 @@ class App extends React.Component {
 
     return (
       <div className={style.App}>
-        <Header />
+        <Header
+          saveAction={() => {}}
+          saveDisplay={
+            (
+              !this.state.hideSaveTrace || this.state.hideSaveTrace !== trace.hash
+            ) && !(
+              trace.db && trace.db.traceId
+            )
+          }
+          saveHide={() => {
+            this.setState({
+              hideSaveTrace: trace.hash,
+            });
+          }}
+        />
         <div className={style.northLayout}>
           <div className={style.left}>
             <Info trace={trace} />

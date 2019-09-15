@@ -35,13 +35,11 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    ipcRenderer.send('getIgcLast');
+    ipcRenderer.send('getLast');
   }
 
   render() {
     const { trace, positionSelected } = this.state;
-
-    console.log('trace', trace);
 
     if (!trace) {
       return (

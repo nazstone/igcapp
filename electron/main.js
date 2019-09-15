@@ -4,15 +4,17 @@ const {
 
 const path = require('path');
 const isDev = require('electron-is-dev');
+const Store = require('electron-store');
 
 const {
   newTag,
   removeTagById,
   traces,
   traceById,
-  traceLast,
   openFile,
+  getLast,
 } = require('./ipc');
+
 const { start } = require('./db/repo');
 
 let mainWindow;
@@ -20,11 +22,14 @@ let mainWindow;
 const createWindow = async () => {
   // create db and init
   await start();
+  const store = new Store();
+
+  const windowsSize = store.get('window_size');
 
   // create browser
   mainWindow = new BrowserWindow({
-    width: 900,
-    height: 680,
+    width: windowsSize && windowsSize.width || 900,
+    height: windowsSize && windowsSize.height || 680,
     webPreferences: {
       nodeIntegration: true,
     },
@@ -37,6 +42,13 @@ const createWindow = async () => {
     console.log('debug on eletron enabled');
     mainWindow.webContents.openDevTools();
   }
+  mainWindow.on('resize', () => {
+    const { width, height, } = mainWindow.getBounds();
+    store.set('window_size', {
+      width,
+      height,
+    });
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -59,13 +71,13 @@ app.on('activate', () => {
 
 ipcMain.on('getIgcFiles', traces);
 
-ipcMain.on('getIgcLast', traceLast);
-
 ipcMain.on('getIgcById', traceById);
 
 ipcMain.on('addNewTag', newTag);
 
 ipcMain.on('removeTagById', removeTagById);
+
+ipcMain.on('getLast', getLast);
 
 ipcMain.on('addIgcFileAsk', (event) => {
   // dialog to upload

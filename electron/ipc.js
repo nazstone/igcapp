@@ -1,14 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 const sha1 = require('sha1');
+const Store = require('electron-store');
 
 const IGCAnalyzer = require('./igc');
+
+const store = new Store();
 
 const {
   addTrace,
   getTraces,
   getTraceById,
-  getTraceLast,
   addTag,
   removeTag,
 } = require('./db/repo');
@@ -57,14 +59,26 @@ const openFile = (event) => {
   return async (data) => {
     // on result parse each file
     let lastData;
-    // if (!data || !data.filePaths || data.filePaths.length === 0) {
-      if (!data || !data.filePaths || data.filePaths.length === 0) {
+    if (!data || !data.filePaths || data.filePaths.length === 0) {
       event.reply('openFileErr', {
         err: 'empty filepath',
       });
     }
+
     returnAnalyze(data.filePaths[0], lastData, event);
+    store.set('last_file', data.filePaths[0]);
   };
+};
+
+const getLast = (event) => {
+  const last = store.get('last_file');
+  if (!last) {
+    return;
+  }
+  // opening last file opened
+  openFile(event)({
+    filePaths: [last],
+  });
 };
 
 const saveTrace = async (date, hash, path) => {
@@ -81,12 +95,6 @@ const traces = async (event, args) => {
 
 const traceById = async (event, args) => {
   const result = await getTraceById(args.id);
-  const t = mapEntityToJson(result);
-  event.reply('selectedIgcResult', t);
-};
-
-const traceLast = async (event) => {
-  const result = await getTraceLast();
   const t = mapEntityToJson(result);
   event.reply('selectedIgcResult', t);
 };
@@ -110,8 +118,8 @@ module.exports = {
   removeTagById,
   traces,
   traceById,
-  traceLast,
   openFile,
   saveTrace,
+  getLast,
 };
 

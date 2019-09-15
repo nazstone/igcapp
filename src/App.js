@@ -39,7 +39,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { trace } = this.state;
+    const { trace, positionSelected } = this.state;
 
     console.log('trace', trace);
 
@@ -65,15 +65,18 @@ class App extends React.Component {
             && <Flat
               className={style.right}
               points={trace.data.fixes}
-              onClick={data => console.log(data)}
+              onClick={data => this.setState({positionSelected: data})}
             />
           }
         </div>
         <div className={style.southLayout}>
           {
             trace.data
-            && trace.data.fixes
-            && <MapWithTrace points={trace.data.fixes} />
+              && trace.data.fixes
+              && <MapWithTrace 
+                points={trace.data.fixes}
+                positionSelected={positionSelected}
+              />
           }
         </div>
       </div>

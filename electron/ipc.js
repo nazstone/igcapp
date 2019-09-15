@@ -66,6 +66,7 @@ const openFile = (event) => {
     }
 
     returnAnalyze(data.filePaths[0], lastData, event);
+    store.clear('last_file');
     store.set('last_file', data.filePaths[0]);
   };
 };

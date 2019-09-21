@@ -60,10 +60,11 @@ const openFile = (event) => {
   return async ({ path, traceId }) => {
     // on result parse each file
     let lastData;
-    if (!path) {
+    if (!path && !traceId) {
       event.reply('openFileErr', {
         err: 'empty filepath',
       });
+      return;
     }
 
     let dbTrace = {};
@@ -72,7 +73,7 @@ const openFile = (event) => {
       dbTrace = mapEntityToJson(result);
     }
 
-    returnAnalyze(path, lastData, event, dbTrace);
+    returnAnalyze(path || dbTrace.path, lastData, event, dbTrace);
     store.clear('last_file');
     store.set('last_file', {
       traceId,
@@ -130,9 +131,9 @@ const traces = async (event, args) => {
 };
 
 const traceById = async (event, args) => {
-  const result = await getTraceById(args.id);
-  const t = mapEntityToJson(result);
-  event.reply('selectedIgcResult', t);
+  openFile(event)({
+    traceId: args.id
+  });
 };
 
 const newTag = async (event, args) => {

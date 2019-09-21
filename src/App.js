@@ -44,7 +44,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { trace, positionSelected } = this.state;
+    const { trace, positionSelected, positionHovered } = this.state;
 
     return (
       <div className={style.App}>
@@ -74,6 +74,8 @@ class App extends React.Component {
               && <MapWithTrace 
                 points={trace.data.fixes}
                 positionSelected={positionSelected}
+                positionHovered={positionHovered}
+                onSelectPosition={data => this.setState({positionSelected: data})}
               />
           }
         </div>

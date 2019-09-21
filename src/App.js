@@ -24,7 +24,6 @@ class App extends React.Component {
       if (!arg.ok) {
         console.error(arg.err);
       }
-      console.log(arg.data.id);
       this.setState(prSt => {
         prSt.trace.dbTrace.id = arg.data.id;
         return {

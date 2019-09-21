@@ -1,7 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withTranslation } from 'react-i18next';
-import { Line } from 'react-chartjs-2';
+
+import {
+    FlexibleXYPlot,
+    XAxis,
+    YAxis,
+    LineSeries,
+    DiscreteColorLegend,
+    MarkSeries,
+    Crosshair
+} from 'react-vis';
+
 
 class Flat extends React.Component {
     static propTypes = {
@@ -9,7 +19,9 @@ class Flat extends React.Component {
         t: PropTypes.func.isRequired,
 
         points: PropTypes.arrayOf(PropTypes.any),
+        positionSelected: PropTypes.any,
 
+        onMouseHover: PropTypes.func,
         onClick: PropTypes.func,
     }
 
@@ -17,158 +29,239 @@ class Flat extends React.Component {
         className: '',
 
         points: [],
+        positionSelected: undefined,
 
+        onMouseHover: () => {},
         onClick: () => {},
     }
+
+    pressColor = 'rgba(204,255,204,1)';
+    gpsColor = 'rgba(75,192,192,0.4)';
 
     constructor(props) {
         super(props);
 
         this.clickHandler = this.clickHandler.bind(this);
-
-        this.getPoint = this.getPoint.bind(this);
-
-        this.tooltipTitleCallback = this.tooltipTitleCallback.bind(this);
-        this.tooltipBeforeLabelCallback = this.tooltipBeforeLabelCallback.bind(this);
-        this.tooltipLabelCallback = this.tooltipLabelCallback.bind(this);
-        this.tooltipAfterLabelCallback = this.tooltipAfterLabelCallback.bind(this);
-    }
-    
-    transformPointsToData(points) {
-        if (!points || !points.length || points.length <= 0 ) return [];
-
-        const data = {
-            labels: points.map(p => {
-                return `${(`0${p.time.h}`).slice(-2)}:${(`0${p.time.m}`).slice(-2)}:${(`0${p.time.s}`).slice(-2)}`;
-            }),
-            datasets: [
-                {
-                    label: this.props.t('plot_pressalt'),
-                    fill: false,
-                    lineTension: 1,
-                    backgroundColor: 'rgba(204,255,204,0.4)',
-                    borderColor: 'rgba(204,255,204,1)',
-                    borderCapStyle: 'butt',
-                    borderDash: [],
-                    borderDashOffset: 0.0,
-                    borderJoinStyle: 'miter',
-                    pointBorderColor: 'rgba(204,255,204,1)',
-                    pointBackgroundColor: '#fff',
-                    pointBorderWidth: 1,
-                    pointHoverRadius: 5,
-                    pointHoverBackgroundColor: 'rgba(204,255,204,1)',
-                    pointHoverBorderColor: 'rgba(220,220,220,1)',
-                    pointHoverBorderWidth: 2,
-                    pointRadius: 1,
-                    pointHitRadius: 1,
-                    data: points.map(p => p.pressalt),
-                },
-                {
-                    label: this.props.t('plot_gpsalt'),
-                    fill: false,
-                    lineTension: 1,
-                    backgroundColor: 'rgba(75,192,192,0.4)',
-                    borderColor: 'rgba(75,192,192,1)',
-                    borderCapStyle: 'butt',
-                    borderDash: [],
-                    borderDashOffset: 0.0,
-                    borderJoinStyle: 'miter',
-                    pointBorderColor: 'rgba(75,192,192,1)',
-                    pointBackgroundColor: '#fff',
-                    pointBorderWidth: 1,
-                    pointHoverRadius: 5,
-                    pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-                    pointHoverBorderColor: 'rgba(220,220,220,1)',
-                    pointHoverBorderWidth: 2,
-                    pointRadius: 1,
-                    pointHitRadius: 1,
-                    data: points.map(p => p.gpsalt),
-                },
-            ],
+        this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
+        this.legendsClickHandler = this.legendsClickHandler.bind(this);
+        this.mousePositionHandler = this.mousePositionHandler.bind(this)
+        this.generateTooltipStyle = this.generateTooltipStyle.bind(this)
+        
+        this.state = {
+            gpsVisibility: true,
+            pressVisibility: true,
         };
-
-        return data;
-    }
-
-    tooltipTitleCallback(tooltipItem, data) {
-        const { index } = tooltipItem[0];
-        return `${this.props.t('plot_time')} : ${data.labels[index]}`;
-    }
-
-    getPoint(index) {
-        if (index < 0 || index > this.props.points.length) return;
-
-        return this.props.points[index];
-    }
-
-    reducer(a, b) {
-        if (!a)
-            return b;
-        return `${a}\n${b}`;
     }
     
-    tooltipBeforeLabelCallback(tooltipItem, data) {
-        const point = this.getPoint(tooltipItem.index);
-        const lines = [];
-        lines.push(`${this.props.t('plot_pressalt')} : ${point.pressalt.toFixed(2)}`)
-        lines.push(`${this.props.t('plot_gpsalt')} : ${point.gpsalt.toFixed(2)}`)
-        return lines.reduce(this.reducer);
+    mouseMoveHandler(index) {
+        let point;
+        if (index >= 0
+            && index < this.props.points.length)
+        {
+            point = this.props.points[index];
+        }
+        this.setState({
+            pointHover: point,
+        });
+        this.props.onMouseHover(point);
     }
 
-    tooltipLabelCallback(tooltipItem, data) {
-        const point = this.getPoint(tooltipItem.index);
-        return `${this.props.t('plot_lat')} : ${point.lat.toFixed(4)}`;
+    clickHandler(event) {
+        if (event.button === 0) {
+            this.props.onClick(this.state.pointHover);
+        } else {
+            this.props.onClick(undefined);
+        }
     }
 
-    tooltipAfterLabelCallback(tooltipItem, data) {
-        const point = this.getPoint(tooltipItem.index);
-        const lines = [];
-        lines.push(`${this.props.t('plot_lng')} : ${point.lng.toFixed(2)}`)
-        lines.push(`${this.props.t('plot_speed')} : ${point.speed.toFixed(2)}`)
-        return lines.reduce(this.reducer);
+    legendsClickHandler(val, index) {
+        if (index === 0) {
+            this.setState({
+                pressVisibility: !this.state.pressVisibility,
+            })
+        }
+        if (index === 1) {
+            this.setState({
+                gpsVisibility: !this.state.gpsVisibility,
+            })
+        }
     }
 
-    clickHandler(data) {
-        if (!data || !data.length || data.length <= 0) return;
+    mousePositionHandler(event) {
+        this.setState({
+            x: event.pageX,
+            y: event.pageY,
+            xPosition: (window.innerWidth > event.pageX + 220) ? 'right': 'left',
+        });
+    }
 
-        const index = data[0]._index;
-        if (index < 0 || index > this.props.points.length) return;
+    formatTime(value) {
+        if (!value) return '';
+        const time = new Date(value * 1000);
+        const h = time.getHours();
+        const m = time.getMinutes();
+        const s = time.getSeconds();
+        return `${(`0${h}`).slice(-2)}:${(`0${m}`).slice(-2)}:${(`0${s}`).slice(-2)}`
+    }
 
-        const elementClicked = this.props.points[index];
-
-        this.props.onClick(elementClicked);
+    generateTooltipStyle() {
+        if(this.state.xPosition === 'right') {
+            return {
+                width: '210px',
+                fontSize: '10pt',
+                backgroundColor: 'gray',
+                borderRadius: '3px',
+                padding: '5px',
+                position: 'fixed',
+                top: this.state.y + 10,
+                left: this.state.x + 10,
+                zIndex: '9999',
+            };
+        } else {
+            return {
+                width: '210px',
+                fontSize: '10pt',
+                backgroundColor: 'gray',
+                borderRadius: '3px',
+                padding: '5px',
+                position: 'fixed',
+                top: this.state.y + 10,
+                left: this.state.x - 220,
+                zIndex: '9999',
+            };
+        }
     }
 
     render() {
-        const data = this.transformPointsToData(this.props.points);
+        const pressAltData = this.props.points.map(pt => {
+            return {
+                x: pt.time.t,
+                y: pt.pressalt,
+            };
+        });
+        const gpsAltData = this.props.points.map(pt => {
+            return {
+                x: pt.time.t,
+                y: pt.gpsalt,
+            };
+        });
+        const pressAltHoveredPoint = {
+            x: this.state.pointHover ? this.state.pointHover.time.t : 0,
+            y: this.state.pointHover ? this.state.pointHover.pressalt: 0,
+        };
+        const gpsAltHoveredPoint = {
+            x: this.state.pointHover ? this.state.pointHover.time.t : 0,
+            y: this.state.pointHover ? this.state.pointHover.gpsalt: 0,
+        };
+        const hoveredPoint = [pressAltHoveredPoint, gpsAltHoveredPoint];
+        const selectedPoint = [];
+        if (this.state.pressVisibility) {
+            selectedPoint.push({
+                x: this.props.positionSelected ? this.props.positionSelected.time.t : 0,
+                y: this.props.positionSelected ? this.props.positionSelected.pressalt: 0,
+            });
+        }
+        if (this.state.gpsVisibility) {
+            selectedPoint.push({
+                x: this.props.positionSelected ? this.props.positionSelected.time.t : 0,
+                y: this.props.positionSelected ? this.props.positionSelected.gpsalt: 0,
+            });
+        }
+
+        const styleAxis = {
+            text: {
+                fontSize: '8pt',
+            },
+            line : {
+                stroke: 'rgba(0,0,0,0.1)' 
+            },
+        };
         return (
-            <div className={this.props.className}>
-                {
-                    data
-                    && <Line
-                        onElementsClick={this.clickHandler}
-                        data={data}
-                        className={this.props.className}
-                        options= {{
-                            tooltips: {
-                                mode: 'nearest',
-                                displayColors: false,
-                                callbacks: {
-                                    title: this.tooltipTitleCallback,
-                                    label: this.tooltipLabelCallback,
-                                    beforeLabel: this.tooltipBeforeLabelCallback,
-                                    afterLabel: this.tooltipAfterLabelCallback,
-                                },
-                            },
-                            animation: {
-                                duration: 0,
-                            },
-                            responsive: true,
-                            maintainAspectRatio: false,
-                        }}
-                        redraw
+            <div className={this.props.className} style={{ display: 'flex', flexDirection: 'column' }} >
+                <DiscreteColorLegend
+                    style={{ position: 'fixed', top: '60', right: '0', marginRight: '15px', marginTop: '15px', display: 'flex', flexDirection: 'column' }}
+                    items={[
+                        {
+                            title: this.props.t('plot_pressalt'),
+                            color: this.pressColor,
+                            strokeWidth: 2,
+                            disabled: !this.state.pressVisibility,
+                        }, {
+                            title: this.props.t('plot_gpsalt'),
+                            color: this.gpsColor,
+                            strokeWidth: 2,
+                            disabled: !this.state.gpsVisibility,
+                        }
+                    ]}
+                    onItemClick={this.legendsClickHandler}
+                />
+                <FlexibleXYPlot
+                    style={{ flex: '1' }}
+                    onMouseLeave={() => this.mouseMoveHandler(-1)}
+                    onMouseMove={this.mousePositionHandler}
+                    onMouseDown={(event) => this.clickHandler(event)}
+                >
+                    <XAxis
+                        tickLabelAngle={-25}
+                        tickSize={3}
+                        tickFormat={(value, index, scale, tickTotal) => this.formatTime(value)}
+                        style={styleAxis}
                     />
-                }
+                    <YAxis
+                        tickSize={3}
+                        style={styleAxis}
+                    />
+
+                    {this.state.pressVisibility && <LineSeries
+                        data={pressAltData}
+                        stroke={this.pressColor}
+                        strokeWidth="2px"
+                        style={{ fill: 'none' }}
+                        onNearestX={(value, {index}) => { this.mouseMoveHandler(index); }}
+                    />}
+                    {this.state.gpsVisibility && <LineSeries
+                        data={gpsAltData}
+                        stroke={this.gpsColor}
+                        strokeWidth="2px"
+                        style={{ fill: 'none' }}
+                        onNearestX={(value, {index}) => { this.mouseMoveHandler(index); }}
+                    />}
+
+                    {/* dots for line series */}
+                    {this.state.pressVisibility && this.state.pointHover && <MarkSeries
+                        data={[pressAltHoveredPoint]}
+                        fill={this.pressColor}
+                        color="lightgray"
+                        size="4"
+                    />}
+                    {this.state.gpsVisibility && this.state.pointHover && <MarkSeries
+                        data={[gpsAltHoveredPoint]}
+                        fill={this.gpsColor}
+                        color="lightgray"
+                        size="4"
+                    />}
+
+                    {/* dots for selected point */}
+                    {this.props.positionSelected && <MarkSeries
+                        data={selectedPoint}
+                        fill="rgba(0,0,0,0.3)"
+                        color="rgba(0,0,0,0.6)"
+                        size="3"
+                    />}
+
+                    {/* Tooltip */}
+                    {this.state.pointHover && <Crosshair
+                        values={hoveredPoint}
+                    >
+                        <div style={this.generateTooltipStyle()}>
+                            <span><b>{this.props.t('plot_time')} : </b>{this.formatTime(this.state.pointHover.time.t)}</span><br />
+                            <span><b>{this.props.t('plot_gpsalt')} : </b>{this.state.pointHover.gpsalt.toFixed(2)}m.</span><br />
+                            <span><b>{this.props.t('plot_pressalt')} : </b>{this.state.pointHover.pressalt.toFixed(2)}m.</span><br />
+                            <span><b>{this.props.t('plot_lat')} : </b>{this.state.pointHover.lat.toFixed(2)}</span><br />
+                            <span><b>{this.props.t('plot_lng')} : </b>{this.state.pointHover.lng.toFixed(2)}</span><br />
+                        </div>
+                    </Crosshair>}
+                </FlexibleXYPlot>
             </div>
         );
     }

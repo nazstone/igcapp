@@ -8,9 +8,11 @@
 		"igc"
 	],
 	"author": "nazstone",
-	"contributors": [{
-		"name": "dubuis"
-	}],
+	"contributors": [
+		{
+			"name": "dubuis"
+		}
+	],
 	"license": "MIT",
 	"homepage": "./",
 	"dependencies": {

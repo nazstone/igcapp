@@ -13,6 +13,7 @@ const {
   traceById,
   openFile,
   getLast,
+  saveTrace,  
 } = require('./ipc');
 
 const { start } = require('./db/repo');
@@ -75,6 +76,8 @@ ipcMain.on('getIgcById', traceById);
 
 ipcMain.on('addNewTag', newTag);
 
+ipcMain.on('saveTrace', saveTrace);
+
 ipcMain.on('removeTagById', removeTagById);
 
 ipcMain.on('getLast', getLast);
@@ -87,5 +90,11 @@ ipcMain.on('addIgcFileAsk', (event) => {
       { name: 'IGC', extensions: ['igc'] },
     ],
     properties: ['openFile'],
-  }).then((d) => openFile(event)(d));
+  }).then((d) => {
+    console.log(d);
+    const path = d && d.filePaths && d.filePaths.length > 0 && d.filePaths[0];
+    openFile(event)({
+      path,
+    });
+  });
 });

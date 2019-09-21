@@ -72,12 +72,12 @@ class Info extends React.Component {
                 <FlightSumup
                   track={trace.data.track}
                   date={trace.data.metadata.date}
-                  tags={trace.tags}
+                  tags={trace.dbTrace.tags}
                   file={{
                     path: trace.path,
                     filename: trace.filename,
                   }}
-                  traceId={trace.id}
+                  traceId={trace.dbTrace.id}
                 />
                 )
             }

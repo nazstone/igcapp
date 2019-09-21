@@ -43,7 +43,7 @@ const addTrace = async (dateStr, hash, path) => {
   } catch (err) {
   }
 
-  await db.trace.findOrCreate({
+  return await db.trace.findOrCreate({
     where: {
       hash,
     },

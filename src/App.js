@@ -20,6 +20,19 @@ class App extends React.Component {
     };
 
     // listener on ipc render
+    ipcRenderer.on('saveFileResult', (event, arg) => {
+      if (!arg.ok) {
+        console.error(arg.err);
+      }
+      console.log(arg.data.id);
+      this.setState(prSt => {
+        prSt.trace.dbTrace.id = arg.data.id;
+        return {
+          ...prSt,
+        }
+      }, () => console.log(this.state));
+    });
+
     ipcRenderer.on('openFileErr', (event, arg) => {
       if (arg.err) {
         console.log(arg);
@@ -53,12 +66,23 @@ class App extends React.Component {
     return (
       <div className={style.App}>
         <Header
-          saveAction={() => {}}
+          saveAction={() => {
+            console.log('saving data', {
+              date: trace.data.metadata.date,
+              hash: trace.hash,
+              path: trace.path,
+            });
+            ipcRenderer.send('saveTrace', {
+              date: trace.data.metadata.date,
+              hash: trace.hash,
+              path: trace.path,
+            })
+          }}
           saveDisplay={
             (
               !this.state.hideSaveTrace || this.state.hideSaveTrace !== trace.hash
             ) && !(
-              trace.db && trace.db.traceId
+              trace.dbTrace.id
             )
           }
           saveHide={() => {

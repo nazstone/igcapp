@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const sha1 = require('sha1');
 const Store = require('electron-store');
+const { app } = require('electron');
 
 const IGCAnalyzer = require('./igc');
 
@@ -15,7 +16,7 @@ const {
   removeTag,
 } = require('./db/repo');
 
-const returnAnalyze = (filePath, lastData, event) => {
+const returnAnalyze = (filePath, lastData, event, dbTrace) => {
   try {
     const igcData = fs.readFileSync(filePath);
     const filename = path.basename(filePath);
@@ -26,6 +27,7 @@ const returnAnalyze = (filePath, lastData, event) => {
       filename: filename,
       data: lastData,
       hash: sha1(igcData),
+      dbTrace,
     });
   } catch (err) {
     event.reply('openFileErr', err);
@@ -38,11 +40,10 @@ const mapEntityToJson = (r) => {
     return {};
   }
   const tags = result.dataValues.Tags.map((d) => {
-    const data = d;
-    delete data.dataValues.createdAt;
-    delete data.dataValues.updatedAt;
-    delete data.dataValues.TraceId;
-    return data.dataValues;
+    delete d.dataValues.createdAt;
+    delete d.dataValues.updatedAt;
+    delete d.dataValues.TraceId;
+    return d.dataValues;
   });
 
   delete result.dataValues.Tags;
@@ -50,40 +51,74 @@ const mapEntityToJson = (r) => {
   delete result.dataValues.updatedAt;
   return ({
     ...result.dataValues,
-    data,
     tags,
   });
 };
 
 const openFile = (event) => {
-  return async (data) => {
+  /** data is a object with path and traceId */
+  return async ({ path, traceId }) => {
     // on result parse each file
     let lastData;
-    if (!data || !data.filePaths || data.filePaths.length === 0) {
+    if (!path) {
       event.reply('openFileErr', {
         err: 'empty filepath',
       });
     }
 
-    returnAnalyze(data.filePaths[0], lastData, event);
+    let dbTrace = {};
+    if (traceId) {
+      const result = await getTraceById(traceId);
+      dbTrace = mapEntityToJson(result);
+    }
+
+    returnAnalyze(path, lastData, event, dbTrace);
     store.clear('last_file');
-    store.set('last_file', data.filePaths[0]);
+    store.set('last_file', {
+      traceId,
+      path,
+    });
   };
 };
 
 const getLast = (event) => {
-  const last = store.get('last_file');
-  if (!last) {
+  const igcappStore = store.get('last_file');
+  if (!igcappStore) {
     return;
   }
   // opening last file opened
-  openFile(event)({
-    filePaths: [last],
-  });
+  openFile(event)(igcappStore);
 };
 
-const saveTrace = async (date, hash, path) => {
-  await addTrace(date, hash, path);
+const saveTrace = async (event, { date, hash, path: pathTmp, }) => {
+  try {
+    // Move the file to $HOME
+    const filename = path.basename(pathTmp);
+    const dir = `${app.getPath('userData')}/traces`;
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+    const newPath = `${dir}/${filename}`;
+    fs.createReadStream(pathTmp).pipe(fs.createWriteStream(newPath));
+
+    // save db
+    const res = await addTrace(date, hash, newPath);
+    event.reply('saveFileResult', {
+      ok: true,
+      data: res[0].dataValues,
+    });
+    // store
+    store.set('last_file', {
+      traceId: res[0].dataValues.id,
+      path: newPath,
+    });
+  } catch (err) {
+    console.error(err);
+    event.reply('saveFileResult', {
+      ok: false,
+      err: 'Cannot save file',
+    });
+  }
 };
 
 const traces = async (event, args) => {

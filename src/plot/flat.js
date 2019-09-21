@@ -177,7 +177,7 @@ class Flat extends React.Component {
             },
         };
         return (
-            <div className={this.props.className} style={{ display: 'flex', flexDirection: 'column' }} >
+            <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }} >
                 <DiscreteColorLegend
                     style={{ position: 'fixed', top: '60', right: '0', marginRight: '15px', marginTop: '15px', display: 'flex', flexDirection: 'column' }}
                     items={[

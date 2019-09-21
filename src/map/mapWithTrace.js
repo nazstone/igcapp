@@ -5,10 +5,13 @@ import {
   Popup,
   Polyline,
   TileLayer,
+  Icon,
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { withTranslation } from 'react-i18next';
 import L from 'leaflet';
+
+import { distance } from '../utils/latlngUtils';
 
 import 'leaflet/dist/leaflet.css';
 import style from './mapWithTrace.module.scss';
@@ -21,11 +24,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-
 class MapWithTrace extends React.Component {
   static propTypes = {
     points: PropTypes.arrayOf(PropTypes.any),
     positionSelected: PropTypes.any,
+    positionHovered: PropTypes.any,
+
+    onSelectPosition: PropTypes.func,
 
     t: PropTypes.func.isRequired,
   };
@@ -33,30 +38,111 @@ class MapWithTrace extends React.Component {
   static defaultProps = {
     points: [],
     positionSelected: undefined,
+    positionHovered: undefined,
+
+    onSelectPosition: () => {},
   };
 
-  componentDidMount() {
-    console.log('didmount', this.props);
+  constructor(props) {
+    super(props);
+  
+    this.state = {
+      positionSelected: props.positionSelected, 
+    };
+
+    this.dragHandler = this.dragHandler.bind(this);
+    this.closestPoint = this.closestPoint.bind(this);
+  }
+  
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      positionSelected: nextProps.positionSelected, 
+    });
+  }
+  
+  
+  getCenterPoint() {
+    let minLat = this.props.points.reduce((min, p) => {
+      return p.lat < min ? p.lat : min;
+    }, Number.MAX_VALUE);
+    let minLng = this.props.points.reduce((min, p) => {
+      return p.lng < min ? p.lng : min;
+    }, Number.MAX_VALUE);
+    
+    let maxLat = this.props.points.reduce((max, p) => {
+      return p.lat > max ? p.lat : max;
+    }, Number.MIN_VALUE);
+    let maxLng = this.props.points.reduce((max, p) => {
+      return p.lng > max ? p.lng : max;
+    }, Number.MIN_VALUE);
+
+    return {
+      lat: (maxLat + minLat) / 2,
+      lng: (maxLng + minLng) / 2,
+    };
+  }
+
+  dragHandler(event) {
+    const { positionSelected } = this.state;
+    const latlng = event.target._latlng;
+
+    const betterPoint = this.closestPoint(latlng);
+    this.setState({ positionSelected: betterPoint});
+    this.props.onSelectPosition(betterPoint);
+  }
+
+  closestPoint(latlng) {
+    let betterPoint;
+    let betterDistance = Number.MAX_VALUE;
+    this.props.points.forEach(pt => {
+      const dist = distance(pt.lat, pt.lng, latlng.lat, latlng.lng);
+      if (dist < betterDistance) {
+        betterPoint = pt;
+        betterDistance = dist;
+      }
+    });
+    return betterPoint;
   }
 
   render() {
-    const position = this.props.points[0];
-    const { positionSelected } = this.props;
+    const position = this.props.positionHovered || this.props.points[0];
+    const { positionSelected } = this.state;
+
+    const myIcon = new L.Icon({
+      iconUrl: require('./markers/marker-icon-black.png'),
+      shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [-3, -76],
+      shadowAnchor: [12, 41]
+    });
 
     return (
       <Map
-        center={position}
-        zoom={12}
+        center={this.getCenterPoint()}
         maxZoom={19}
         className={style.map}
+        bounds={this.props.points}
+        boundsOptions={{padding: [50, 50]}}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
+        <Marker position={position} opacity={this.props.positionHovered ? 1 : 0.5}>
+            <Popup>
+              <div>
+                <b>{this.props.t('plot_pressalt')} : </b><span>{position.pressalt.toFixed(2)}</span><br/>
+                <b>{this.props.t('plot_gpsalt')} : </b><span>{position.gpsalt.toFixed(2)}</span><br/>
+                <b>{this.props.t('plot_lat')} : </b><span>{position.lat.toFixed(4)}</span><br/>
+                <b>{this.props.t('plot_lng')} : </b><span>{position.lng.toFixed(4)}</span><br/>
+                <b>{this.props.t('plot_speed')} : </b><span>{position.speed.toFixed(2)}</span><br/>
+              </div>
+            </Popup>
+        </Marker>
         {
           positionSelected && (
-            <Marker position={positionSelected}>
+            <Marker position={positionSelected} icon={myIcon} onDragend={this.dragHandler} draggable opacity={0.8}>
               <Popup>
                 <div>
                   <b>{this.props.t('plot_pressalt')} : </b><span>{positionSelected.pressalt.toFixed(2)}</span><br/>
@@ -69,11 +155,10 @@ class MapWithTrace extends React.Component {
             </Marker>
           )
         }
-        <Marker position={position}>
-          <Popup>A pretty CSS3 popup.<br />Easily customizable.</Popup>
-        </Marker>
         <Polyline
+          color="rgba(30,144,255,0.55)"
           positions={this.props.points}
+          onClick={e => this.props.onSelectPosition(this.closestPoint(e.latlng))}
         />
       </Map>
     );

@@ -6,6 +6,7 @@ import paginationFactory, { PaginationProvider, PaginationListStandalone } from 
 
 import Tag from '../../tag/tag';
 import style from './search.trace.module.scss';
+import moment from 'moment';
 
 const SIZE_PER_PAGE = 10;
 
@@ -35,9 +36,6 @@ const RemotePagination = ({
           paginationTableProps,
         }) => (
           <div>
-            <PaginationListStandalone
-              {...paginationProps}
-            />
             <BootstrapTable
               className={style.table}
               remote
@@ -49,6 +47,9 @@ const RemotePagination = ({
               {...paginationTableProps}
               onTableChange={onTableChange}
               rowEvents={rowEvents}
+            />
+            <PaginationListStandalone
+              {...paginationProps}
             />
           </div>
         )
@@ -130,6 +131,7 @@ class SearchTrace extends React.Component {
     const columns = [{
       dataField: 'date',
       text: t('search_column_date'),
+      formatter: (_cell, row) => moment(row.date).format('DD MMMM YYYY')
     }, {
       dataField: 'tags',
       text: t('search_column_tag'),

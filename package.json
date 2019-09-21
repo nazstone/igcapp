@@ -8,6 +8,9 @@
 		"igc"
 	],
 	"author": "nazstone",
+	"contributors": [{
+		"name": "dubuis"
+	}],
 	"license": "MIT",
 	"homepage": "./",
 	"dependencies": {
@@ -16,7 +19,6 @@
 		"@fortawesome/react-fontawesome": "^0.1.4",
 		"awesome-debounce-promise": "^2.1.0",
 		"bootstrap": "^4.3.1",
-		"chart.js": "^2.8.0",
 		"classnames": "^2.2.6",
 		"electron-is-dev": "^1.1.0",
 		"electron-reload": "^1.5.0",
@@ -29,11 +31,11 @@
 		"react": "^16.9.0",
 		"react-bootstrap-table-next": "^3.2.0",
 		"react-bootstrap-table2-paginator": "^2.1.0",
-		"react-chartjs-2": "^2.7.6",
 		"react-dom": "^16.9.0",
 		"react-i18next": "^10.12.2",
 		"react-leaflet": "^2.4.0",
 		"react-scripts": "3.1.1",
+		"react-vis": "^1.11.7",
 		"reactstrap": "^8.0.1",
 		"sequelize": "^5.16.0",
 		"sha1": "^1.1.1",
@@ -64,6 +66,7 @@
 		"test": "rescripts test",
 		"eject": "react-scripts eject",
 		"electron-dev": "concurrently \"BROWSER=none npm run start\" \"wait-on http://localhost:3000 && electron .\"",
+		"electron-dev:win": "concurrently \"set BROWSER=none&&npm run start\" \"wait-on http://localhost:3000 && electron .\"",
 		"postinstall": "electron-builder install-app-deps",
 		"preelectron-pack": "npm run build",
 		"electron-pack": "electron-builder",

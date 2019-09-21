@@ -60,6 +60,8 @@ class App extends React.Component {
             && <Flat
               className={style.right}
               points={trace.data.fixes}
+              positionSelected={positionSelected}
+              onMouseHover={data => this.setState({positionHovered: data})}
               onClick={data => this.setState({positionSelected: data})}
             />
           }

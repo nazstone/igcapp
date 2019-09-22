@@ -15,6 +15,7 @@ const { ipcRenderer } = window.require('electron');
 class FlightSumup extends React.Component {
   static propTypes = {
     date: PropTypes.string,
+    filename: PropTypes.string,
     traceId: PropTypes.number,
     tags: PropTypes.arrayOf(PropTypes.any),
     track: PropTypes.any, // eslint-disable-line react/forbid-prop-types
@@ -22,6 +23,7 @@ class FlightSumup extends React.Component {
   };
 
   static defaultProps = {
+    filename: '',
     track: null,
     date: null,
     traceId: null,
@@ -57,6 +59,7 @@ class FlightSumup extends React.Component {
       t,
       tags,
       traceId,
+      filename,
     } = this.props;
 
     if (!track) {
@@ -67,7 +70,7 @@ class FlightSumup extends React.Component {
       <div className={style.parent}>
         <div className="line">
           <div className="title">{t('sumup_filename')}:</div>
-          <div>{this.props.file.filename}</div>
+          <div>{filename}</div>
         </div>
         {/* <div className="line">{this.props.file.path}</div> */}
         <div className="line">
@@ -78,7 +81,8 @@ class FlightSumup extends React.Component {
           <div className="title">{t('sumup_duration')}:</div>
           <div>{moment.utc(track.duration * 1000).format('HH:mm:ss')}</div>
         </div>
-        { traceId && <div className="line">
+        { traceId && (
+        <div className="line">
           <div className="title">{t('sumup_tag')}:</div>
           <div className={style.tags}>{
             tags.map((td) => (
@@ -105,9 +109,10 @@ class FlightSumup extends React.Component {
               this.state.tagDisplay
               && (
               <>
-                <input type="text"
+                <input
+                  type="text"
                   placeholder={t('sumup_type_tag')}
-                  ref={el => this.inputRef = el}
+                  ref={(el) => this.inputRef = el}
                 />
                 <FontAwesomeIcon
                   icon={faCheckCircle}
@@ -119,7 +124,8 @@ class FlightSumup extends React.Component {
               )
             }
           </div>
-        </div>}
+        </div>
+        )}
         <div className="line">
           <div className="title">{t('sumup_distance')}:</div>
           <div>{Math.round(track.distance)}</div>

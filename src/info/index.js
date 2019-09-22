@@ -73,10 +73,7 @@ class Info extends React.Component {
                   track={trace.data.track}
                   date={trace.data.metadata.date}
                   tags={trace.dbTrace.tags}
-                  file={{
-                    path: trace.path,
-                    filename: trace.filename,
-                  }}
+                  filename={trace.filename}
                   traceId={trace.dbTrace.id}
                 />
                 )

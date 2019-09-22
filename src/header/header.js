@@ -30,9 +30,15 @@ const { ipcRenderer } = window.require('electron');
 class Header extends React.Component {
   static propTypes = {
     t: PropTypes.func.isRequired,
+    saveDisplay: PropTypes.func,
+    saveAction: PropTypes.func,
+    saveHide: PropTypes.func,
   };
 
   static defaultProps = {
+    saveDisplay: () => {},
+    saveAction: () => {},
+    saveHide: () => {},
   };
 
   constructor(props) {
@@ -63,7 +69,9 @@ class Header extends React.Component {
 
 
   render() {
-    const { t, saveDisplay, saveAction, saveHide } = this.props;
+    const {
+      t, saveDisplay, saveAction, saveHide,
+    } = this.props;
 
     return (
       <Navbar color="light" light expand="lg">

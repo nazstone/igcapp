@@ -5,30 +5,35 @@ import {
   Popup,
   Polyline,
   TileLayer,
-  Icon,
 } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { withTranslation } from 'react-i18next';
 import L from 'leaflet';
+import iconMarkerRetina from 'leaflet/dist/images/marker-icon-2x.png';
+import iconMarker from 'leaflet/dist/images/marker-icon.png';
+import shadowUrlMarker from 'leaflet/dist/images/marker-shadow.png';
+
+import iconMarkerDark from './markers/marker-icon-black.png';
 
 import { distance } from '../utils/latlngUtils';
 
 import 'leaflet/dist/leaflet.css';
 import style from './mapWithTrace.module.scss';
 
+
 delete L.Icon.Default.prototype._getIconUrl;// eslint-disable-line no-underscore-dangle
 
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  iconRetinaUrl: iconMarkerRetina,
+  iconUrl: iconMarker,
+  shadowUrl: shadowUrlMarker,
 });
 
 class MapWithTrace extends React.Component {
   static propTypes = {
     points: PropTypes.arrayOf(PropTypes.any),
-    positionSelected: PropTypes.any,
-    positionHovered: PropTypes.any,
+    positionSelected: PropTypes.any, // eslint-disable-line react/forbid-prop-types
+    positionHovered: PropTypes.any, // eslint-disable-line react/forbid-prop-types
 
     onSelectPosition: PropTypes.func,
 
@@ -45,36 +50,36 @@ class MapWithTrace extends React.Component {
 
   constructor(props) {
     super(props);
-  
+
     this.state = {
-      positionSelected: props.positionSelected, 
+      positionSelected: props.positionSelected,
     };
 
     this.dragHandler = this.dragHandler.bind(this);
     this.closestPoint = this.closestPoint.bind(this);
   }
-  
+
   componentWillReceiveProps(nextProps) {
     this.setState({
-      positionSelected: nextProps.positionSelected, 
+      positionSelected: nextProps.positionSelected,
     });
   }
-  
-  
+
+
   getCenterPoint() {
-    let minLat = this.props.points.reduce((min, p) => {
-      return p.lat < min ? p.lat : min;
-    }, Number.MAX_VALUE);
-    let minLng = this.props.points.reduce((min, p) => {
-      return p.lng < min ? p.lng : min;
-    }, Number.MAX_VALUE);
-    
-    let maxLat = this.props.points.reduce((max, p) => {
-      return p.lat > max ? p.lat : max;
-    }, Number.MIN_VALUE);
-    let maxLng = this.props.points.reduce((max, p) => {
-      return p.lng > max ? p.lng : max;
-    }, Number.MIN_VALUE);
+    const minLat = this.props.points.reduce(
+      (min, p) => (p.lat < min ? p.lat : min), Number.MAX_VALUE,
+    );
+    const minLng = this.props.points.reduce(
+      (min, p) => (p.lng < min ? p.lng : min), Number.MAX_VALUE,
+    );
+
+    const maxLat = this.props.points.reduce(
+      (max, p) => (p.lat > max ? p.lat : max), Number.MIN_VALUE,
+    );
+    const maxLng = this.props.points.reduce(
+      (max, p) => (p.lng > max ? p.lng : max), Number.MIN_VALUE,
+    );
 
     return {
       lat: (maxLat + minLat) / 2,
@@ -83,18 +88,17 @@ class MapWithTrace extends React.Component {
   }
 
   dragHandler(event) {
-    const { positionSelected } = this.state;
-    const latlng = event.target._latlng;
+    const latlng = event.target._latlng;// eslint-disable-line no-underscore-dangle
 
     const betterPoint = this.closestPoint(latlng);
-    this.setState({ positionSelected: betterPoint});
+    this.setState({ positionSelected: betterPoint });
     this.props.onSelectPosition(betterPoint);
   }
 
   closestPoint(latlng) {
     let betterPoint;
     let betterDistance = Number.MAX_VALUE;
-    this.props.points.forEach(pt => {
+    this.props.points.forEach((pt) => {
       const dist = distance(pt.lat, pt.lng, latlng.lat, latlng.lng);
       if (dist < betterDistance) {
         betterPoint = pt;
@@ -109,12 +113,12 @@ class MapWithTrace extends React.Component {
     const { positionSelected } = this.state;
 
     const myIcon = new L.Icon({
-      iconUrl: require('./markers/marker-icon-black.png'),
-      shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+      iconUrl: iconMarkerDark,
+      shadowUrl: shadowUrlMarker,
       iconSize: [25, 41],
       iconAnchor: [12, 41],
       popupAnchor: [-3, -76],
-      shadowAnchor: [12, 41]
+      shadowAnchor: [12, 41],
     });
 
     return (
@@ -123,33 +127,39 @@ class MapWithTrace extends React.Component {
         maxZoom={19}
         className={style.map}
         bounds={this.props.points}
-        boundsOptions={{padding: [50, 50]}}
+        boundsOptions={{ padding: [50, 50] }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
         <Marker position={position} opacity={this.props.positionHovered ? 1 : 0.5}>
-            <Popup>
-              <div>
-                <b>{this.props.t('plot_pressalt')} : </b><span>{position.pressalt.toFixed(2)}</span><br/>
-                <b>{this.props.t('plot_gpsalt')} : </b><span>{position.gpsalt.toFixed(2)}</span><br/>
-                <b>{this.props.t('plot_lat')} : </b><span>{position.lat.toFixed(4)}</span><br/>
-                <b>{this.props.t('plot_lng')} : </b><span>{position.lng.toFixed(4)}</span><br/>
-                <b>{this.props.t('plot_speed')} : </b><span>{position.speed.toFixed(2)}</span><br/>
-              </div>
-            </Popup>
+          <Popup>
+            <div>
+              <b>{this.props.t('plot_pressalt')} : </b><span>{position.pressalt.toFixed(2)}</span><br />
+              <b>{this.props.t('plot_gpsalt')} : </b><span>{position.gpsalt.toFixed(2)}</span><br />
+              <b>{this.props.t('plot_lat')} : </b><span>{position.lat.toFixed(4)}</span><br />
+              <b>{this.props.t('plot_lng')} : </b><span>{position.lng.toFixed(4)}</span><br />
+              <b>{this.props.t('plot_speed')} : </b><span>{position.speed.toFixed(2)}</span><br />
+            </div>
+          </Popup>
         </Marker>
         {
           positionSelected && (
-            <Marker position={positionSelected} icon={myIcon} onDragend={this.dragHandler} draggable opacity={0.8}>
+            <Marker
+              position={positionSelected}
+              icon={myIcon}
+              onDragend={this.dragHandler}
+              draggable
+              opacity={0.8}
+            >
               <Popup>
                 <div>
-                  <b>{this.props.t('plot_pressalt')} : </b><span>{positionSelected.pressalt.toFixed(2)}</span><br/>
-                  <b>{this.props.t('plot_gpsalt')} : </b><span>{positionSelected.gpsalt.toFixed(2)}</span><br/>
-                  <b>{this.props.t('plot_lat')} : </b><span>{positionSelected.lat.toFixed(4)}</span><br/>
-                  <b>{this.props.t('plot_lng')} : </b><span>{positionSelected.lng.toFixed(4)}</span><br/>
-                  <b>{this.props.t('plot_speed')} : </b><span>{positionSelected.speed.toFixed(2)}</span><br/>
+                  <b>{this.props.t('plot_pressalt')} : </b><span>{positionSelected.pressalt.toFixed(2)}</span><br />
+                  <b>{this.props.t('plot_gpsalt')} : </b><span>{positionSelected.gpsalt.toFixed(2)}</span><br />
+                  <b>{this.props.t('plot_lat')} : </b><span>{positionSelected.lat.toFixed(4)}</span><br />
+                  <b>{this.props.t('plot_lng')} : </b><span>{positionSelected.lng.toFixed(4)}</span><br />
+                  <b>{this.props.t('plot_speed')} : </b><span>{positionSelected.speed.toFixed(2)}</span><br />
                 </div>
               </Popup>
             </Marker>
@@ -158,7 +168,7 @@ class MapWithTrace extends React.Component {
         <Polyline
           color="rgba(30,144,255,0.55)"
           positions={this.props.points}
-          onClick={e => this.props.onSelectPosition(this.closestPoint(e.latlng))}
+          onClick={(e) => this.props.onSelectPosition(this.closestPoint(e.latlng))}
         />
       </Map>
     );

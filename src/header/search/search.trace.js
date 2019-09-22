@@ -4,9 +4,9 @@ import { withTranslation } from 'react-i18next';
 import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory, { PaginationProvider, PaginationListStandalone } from 'react-bootstrap-table2-paginator';
 
+import moment from 'moment';
 import Tag from '../../tag/tag';
 import style from './search.trace.module.scss';
-import moment from 'moment';
 
 const SIZE_PER_PAGE = 10;
 
@@ -131,7 +131,7 @@ class SearchTrace extends React.Component {
     const columns = [{
       dataField: 'date',
       text: t('search_column_date'),
-      formatter: (_cell, row) => moment(row.date).format('DD MMMM YYYY')
+      formatter: (_cell, row) => moment(row.date).format('DD MMMM YYYY'),
     }, {
       dataField: 'tags',
       text: t('search_column_tag'),

@@ -24,11 +24,12 @@ class App extends React.Component {
       if (!arg.ok) {
         console.error(arg.err);
       }
-      this.setState(prSt => {
-        prSt.trace.dbTrace.id = arg.data.id;
+      this.setState((prSt) => {
+        const tmp = prSt;
+        tmp.trace.dbTrace.id = arg.data.id;
         return {
-          ...prSt,
-        }
+          ...tmp,
+        };
       }, () => console.log(this.state));
     });
 
@@ -59,7 +60,7 @@ class App extends React.Component {
           <Header />
           No data - Click on add (Plus button)
         </div>
-      )
+      );
     }
 
     return (
@@ -75,7 +76,7 @@ class App extends React.Component {
               date: trace.data.metadata.date,
               hash: trace.hash,
               path: trace.path,
-            })
+            });
           }}
           saveDisplay={
             (
@@ -97,25 +98,29 @@ class App extends React.Component {
           {
             trace.data
             && trace.data.fixes
-            && <Flat
+            && (
+            <Flat
               className={style.right}
               points={trace.data.fixes}
               positionSelected={positionSelected}
-              onMouseHover={data => this.setState({positionHovered: data})}
-              onClick={data => this.setState({positionSelected: data})}
+              onMouseHover={(data) => this.setState({ positionHovered: data })}
+              onClick={(data) => this.setState({ positionSelected: data })}
             />
+            )
           }
         </div>
         <div className={style.southLayout}>
           {
             trace.data
               && trace.data.fixes
-              && <MapWithTrace 
+              && (
+              <MapWithTrace
                 points={trace.data.fixes}
                 positionSelected={positionSelected}
                 positionHovered={positionHovered}
-                onSelectPosition={data => this.setState({positionSelected: data})}
+                onSelectPosition={(data) => this.setState({ positionSelected: data })}
               />
+              )
           }
         </div>
       </div>

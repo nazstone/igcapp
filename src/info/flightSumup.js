@@ -46,10 +46,13 @@ class FlightSumup extends React.Component {
   }
 
   addTag(text, traceId) {
-    ipcRenderer.send('addNewTag', {
-      text,
-      traceId,
-    });
+    if (text) {
+      ipcRenderer.send('addNewTag', {
+        text,
+        traceId,
+      });
+    }
+
     this.tagDisplay();
   }
 

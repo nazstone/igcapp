@@ -11,6 +11,8 @@ module.exports = {
     "react/static-property-placement": [0],
     "react/destructuring-assignment": [0],
     "react/jsx-one-expression-per-line": [0],
-    "react/prefer-stateless-function": false,
+    "react/prefer-stateless-function": 0,
+    "jsx-a11y/anchor-is-valid": 0,
+    "react/jsx-fragments": 0,
   }
 };

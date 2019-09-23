@@ -82,7 +82,7 @@ class Header extends React.Component {
     } = this.props;
 
     return (
-      <Navbar color="light" light expand="lg">
+      <Navbar color="light" light expand="lg" className={style.bar}>
         <FontAwesomeIcon icon={faPaperPlane} size="lg" />
         <NavbarBrand href="#" className={style.title}>{t('header_title')}</NavbarBrand>
         <Nav className="ml-auto">
@@ -113,12 +113,12 @@ class Header extends React.Component {
           {
             this.props.principal && (
               <NavItem>
-                <NavLink>
+                <NavLink href="#" >
                   {this.props.principal === MAP && (
-                    <FontAwesomeIcon icon={faChartLine} onClick={this.props.switchPrincipal} />
+                    <FontAwesomeIcon icon={faChartLine} onClick={this.props.switchPrincipal} size="lg" />
                   )}
                   {this.props.principal === PLOT && (
-                    <FontAwesomeIcon icon={faMapMarked} onClick={this.props.switchPrincipal} />
+                    <FontAwesomeIcon icon={faMapMarked} onClick={this.props.switchPrincipal} size="lg" />
                   )}
                 </NavLink>
               </NavItem>

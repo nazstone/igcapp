@@ -1,27 +1,34 @@
-.title {
-  margin-left: 1rem;
-  font-weight: bolder;
-}
+@import '../constants.scss';
 
-.search {
-  padding: 0px;
-}
+.bar {
+  background-color: $bgColor ! important;
 
-.close {
-  display: none !important;
-}
-
-.table {
-  table-layout: unset !important;
-}
-
-.save {
-  display: flex;
-  align-items: center;
-  background: lightgray;
-  margin-right: 2rem;
-
-  .button {
-    margin-left: 0.3rem;
+  color: $titleColor;
+  .title {
+    margin-left: 1rem;
+    font-weight: bolder;
+    color: $titleColor;
+  }
+  .search {
+    padding: 0px;
+  }
+  
+  .close {
+    display: none !important;
+  }
+  
+  .table {
+    table-layout: unset !important;
+  }
+  
+  .save {
+    display: flex;
+    align-items: center;
+    background: lightgray;
+    margin-right: 2rem;
+  
+    .button {
+      margin-left: 0.3rem;
+    }
   }
 }

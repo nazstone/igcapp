@@ -22,7 +22,7 @@ import {
   faMapMarked,
 } from '@fortawesome/free-solid-svg-icons';
 
-
+import { MAP, PLOT } from '../utils/constants';
 import style from './header.module.scss';
 import SearchTrace from './search/search.trace';
 
@@ -32,7 +32,7 @@ const { ipcRenderer } = window.require('electron');
 class Header extends React.Component {
   static propTypes = {
     t: PropTypes.func.isRequired,
-    principal: PropTypes.oneOf(['map', 'plot']),
+    principal: PropTypes.oneOf([MAP, PLOT]),
 
     saveDisplay: PropTypes.func,
     saveAction: PropTypes.func,
@@ -114,10 +114,10 @@ class Header extends React.Component {
             this.props.principal && (
               <NavItem>
                 <NavLink>
-                  {this.props.principal === 'map' && (
+                  {this.props.principal === MAP && (
                     <FontAwesomeIcon icon={faChartLine} onClick={this.props.switchPrincipal} />
                   )}
-                  {this.props.principal === 'plot' && (
+                  {this.props.principal === PLOT && (
                     <FontAwesomeIcon icon={faMapMarked} onClick={this.props.switchPrincipal} />
                   )}
                 </NavLink>

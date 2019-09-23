@@ -7,8 +7,11 @@ import MapWithTrace from './map/mapWithTrace';
 import Info from './info';
 import Header from './header/header';
 
+import { MAP, PLOT } from './utils/constants';
+
 // eslint-disable-next-line no-undef
 const { ipcRenderer } = window.require('electron');
+
 
 class App extends React.Component {
   constructor(props) {
@@ -17,7 +20,7 @@ class App extends React.Component {
     // define the state
     this.state = {
       trace: null,
-      principal: 'map',
+      principal: MAP,
       mapFullScreen: false,
     };
 
@@ -86,10 +89,10 @@ class App extends React.Component {
 
   getNorthRight() {
     const { principal } = this.state;
-    if (principal === 'map') {
+    if (principal === MAP) {
       return this.getPlot();
     }
-    if (principal === 'plot') {
+    if (principal === PLOT) {
       return this.getMap();
     }
     return <Fragment />;
@@ -97,10 +100,10 @@ class App extends React.Component {
 
   getSouth() {
     const { principal } = this.state;
-    if (principal === 'map') {
+    if (principal === MAP) {
       return this.getMap();
     }
-    if (principal === 'plot') {
+    if (principal === PLOT) {
       return this.getPlot();
     }
     return <Fragment />;
@@ -149,8 +152,8 @@ class App extends React.Component {
             });
           }}
           switchPrincipal={() => {
-            if (this.state.principal === 'map') this.setState({ principal: 'plot' });
-            else if (this.state.principal === 'plot') this.setState({ principal: 'map' });
+            if (this.state.principal === MAP) this.setState({ principal: PLOT });
+            else if (this.state.principal === PLOT) this.setState({ principal: MAP });
             else this.setState({ principal: undefined });
           }}
         />

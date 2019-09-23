@@ -18,6 +18,8 @@ import {
   faPaperPlane,
   faCheckCircle,
   faTimesCircle,
+  faChartLine,
+  faMapMarked,
 } from '@fortawesome/free-solid-svg-icons';
 
 
@@ -30,15 +32,21 @@ const { ipcRenderer } = window.require('electron');
 class Header extends React.Component {
   static propTypes = {
     t: PropTypes.func.isRequired,
+    principal: PropTypes.oneOf(['map', 'plot']),
+
     saveDisplay: PropTypes.func,
     saveAction: PropTypes.func,
     saveHide: PropTypes.func,
+    switchPrincipal: PropTypes.func,
   };
 
   static defaultProps = {
+    principal: undefined,
+
     saveDisplay: () => {},
     saveAction: () => {},
     saveHide: () => {},
+    switchPrincipal: () => {},
   };
 
   constructor(props) {
@@ -100,6 +108,20 @@ class Header extends React.Component {
                 />
               </NavLink>
             </NavItem>
+            )
+          }
+          {
+            this.props.principal && (
+              <NavItem>
+                <NavLink>
+                  {this.props.principal === 'map' && (
+                    <FontAwesomeIcon icon={faChartLine} onClick={this.props.switchPrincipal} />
+                  )}
+                  {this.props.principal === 'plot' && (
+                    <FontAwesomeIcon icon={faMapMarked} onClick={this.props.switchPrincipal} />
+                  )}
+                </NavLink>
+              </NavItem>
             )
           }
           <NavItem>

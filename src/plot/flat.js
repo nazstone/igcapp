@@ -10,6 +10,7 @@ import {
   DiscreteColorLegend,
   MarkSeries,
   Crosshair,
+  Highlight,
 } from 'react-vis';
 
 
@@ -45,9 +46,12 @@ class Flat extends React.Component {
       this.mousePositionHandler = this.mousePositionHandler.bind(this);
       this.generateTooltipStyle = this.generateTooltipStyle.bind(this);
 
+      this.brush = false;
+
       this.state = {
         gpsVisibility: true,
         pressVisibility: true,
+        areaFilter: null,
       };
     }
 
@@ -64,10 +68,18 @@ class Flat extends React.Component {
     }
 
     clickHandler(event) {
+      if (this.brush) {
+        this.brush = false;
+        return;
+      }
       if (event.button === 0) {
         this.props.onClick(this.state.pointHover);
-      } else {
+      } else if (event.button === 2) {
         this.props.onClick(undefined);
+      } else if (event.button === 1) {
+        this.setState({
+          areaFilter: null,
+        });
       }
     }
 
@@ -162,6 +174,8 @@ class Flat extends React.Component {
         });
       }
 
+      const { areaFilter } = this.state;
+
       const styleAxis = {
         text: {
           fontSize: '8pt',
@@ -198,7 +212,15 @@ class Flat extends React.Component {
             style={{ flex: '1' }}
             onMouseLeave={() => this.mouseMoveHandler(-1)}
             onMouseMove={this.mousePositionHandler}
-            onMouseDown={(event) => this.clickHandler(event)}
+            onMouseUp={(event) => this.clickHandler(event)}
+            xDomain={areaFilter && [
+              areaFilter.left,
+              areaFilter.right,
+            ]}
+            yDomain={areaFilter && [
+              areaFilter.bottom,
+              areaFilter.top,
+            ]}
           >
             <XAxis
               tickLabelAngle={-25}
@@ -265,13 +287,22 @@ class Flat extends React.Component {
               >
                 <div style={this.generateTooltipStyle()}>
                   <span><b>{this.props.t('plot_time')} : </b>{this.formatTime(this.state.pointHover.time.t)}</span><br />
-                  <span><b>{this.props.t('plot_gpsalt')} : </b>{this.state.pointHover.gpsalt.toFixed(2)}m.</span><br />
-                  <span><b>{this.props.t('plot_pressalt')} : </b>{this.state.pointHover.pressalt.toFixed(2)}m.</span><br />
+                  <span><b>{this.props.t('plot_gpsalt')} : </b>{this.state.pointHover.gpsalt.toFixed(2)} m.</span><br />
+                  <span><b>{this.props.t('plot_pressalt')} : </b>{this.state.pointHover.pressalt.toFixed(2)} m.</span><br />
                   <span><b>{this.props.t('plot_lat')} : </b>{this.state.pointHover.lat.toFixed(2)}</span><br />
                   <span><b>{this.props.t('plot_lng')} : </b>{this.state.pointHover.lng.toFixed(2)}</span><br />
+                  <span><b>{this.props.t('plot_speed')} : </b>{this.state.pointHover.speed.toFixed(2)} km/h</span><br />
                 </div>
               </Crosshair>
             )}
+
+            <Highlight
+              onBrushEnd={(e) => {
+                if (e) this.brush = true;
+                else return;
+                this.setState({ areaFilter: e });
+              }}
+            />
           </FlexibleXYPlot>
         </div>
       );

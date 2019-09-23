@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 
 import style from './App.module.scss';
 
@@ -17,6 +17,8 @@ class App extends React.Component {
     // define the state
     this.state = {
       trace: null,
+      principal: 'map',
+      mapFullScreen: false,
     };
 
     // listener on ipc render
@@ -52,8 +54,63 @@ class App extends React.Component {
     ipcRenderer.send('getLast');
   }
 
-  render() {
+  getPlot() {
+    const { trace, positionSelected } = this.state;
+    if (!trace || !trace.data || !trace.data.fixes) return (<Fragment />);
+    return (
+      <Flat
+        className={style.right}
+        points={trace.data.fixes}
+        positionSelected={positionSelected}
+        onMouseHover={(data) => this.setState({ positionHovered: data })}
+        onClick={(data) => this.setState({ positionSelected: data })}
+      />
+    );
+  }
+
+  getMap() {
     const { trace, positionSelected, positionHovered } = this.state;
+    if (!trace || !trace.data || !trace.data.fixes) return (<Fragment />);
+    return (
+      <MapWithTrace
+        points={trace.data.fixes}
+        positionSelected={positionSelected}
+        positionHovered={positionHovered}
+        isFullScreen={this.state.mapFullScreen}
+        onSelectPosition={(data) => this.setState({ positionSelected: data })}
+        onFullScreenClick={() => this.setState((prevState) => (
+          { ...prevState, mapFullScreen: !prevState.mapFullScreen }
+        ))}
+      />
+    );
+  }
+
+  getNorthRight() {
+    const { principal } = this.state;
+    if (principal === 'map') {
+      return this.getPlot();
+    }
+    if (principal === 'plot') {
+      return this.getMap();
+    }
+    return <Fragment />;
+  }
+
+  getSouth() {
+    const { principal } = this.state;
+    if (principal === 'map') {
+      return this.getMap();
+    }
+    if (principal === 'plot') {
+      return this.getPlot();
+    }
+    return <Fragment />;
+  }
+
+  render() {
+    const {
+      trace,
+    } = this.state;
 
     if (!trace) {
       return (
@@ -67,6 +124,7 @@ class App extends React.Component {
     return (
       <div className={style.App}>
         <Header
+          principal={this.state.principal}
           saveAction={() => {
             console.log('saving data', {
               date: trace.data.metadata.date,
@@ -91,39 +149,40 @@ class App extends React.Component {
               hideSaveTrace: trace.hash,
             });
           }}
+          switchPrincipal={() => {
+            if (this.state.principal === 'map') this.setState({ principal: 'plot' });
+            else if (this.state.principal === 'plot') this.setState({ principal: 'map' });
+            else this.setState({ principal: undefined });
+          }}
         />
-        <div className={style.northLayout}>
-          <div className={style.left}>
-            <Info trace={trace} />
-          </div>
-          {
-            trace.data
-            && trace.data.fixes
-            && (
-            <Flat
-              className={style.right}
-              points={trace.data.fixes}
-              positionSelected={positionSelected}
-              onMouseHover={(data) => this.setState({ positionHovered: data })}
-              onClick={(data) => this.setState({ positionSelected: data })}
-            />
-            )
-          }
-        </div>
-        <div className={style.southLayout}>
-          {
-            trace.data
-              && trace.data.fixes
-              && (
-              <MapWithTrace
-                points={trace.data.fixes}
-                positionSelected={positionSelected}
-                positionHovered={positionHovered}
-                onSelectPosition={(data) => this.setState({ positionSelected: data })}
-              />
-              )
-          }
-        </div>
+        {
+          this.state && this.state.mapFullScreen && (
+            <div className={style.full}>
+              {this.getMap()}
+            </div>
+          )
+        }
+        {
+          (!this.state || !this.state.mapFullScreen) && (
+            <Fragment>
+              <div className={style.northLayout}>
+                <div className={style.left}>
+                  <Info trace={trace} />
+                </div>
+                <div className={style.right}>
+                  {
+                    this.getNorthRight()
+                  }
+                </div>
+              </div>
+              <div className={style.southLayout}>
+                {
+                  this.getSouth()
+                }
+              </div>
+            </Fragment>
+          )
+        }
       </div>
     );
   }

@@ -5,13 +5,17 @@ import {
   Popup,
   Polyline,
   TileLayer,
+  ScaleControl,
 } from 'react-leaflet';
+import Control from 'react-leaflet-control';
 import PropTypes from 'prop-types';
 import { withTranslation } from 'react-i18next';
 import L from 'leaflet';
 import iconMarkerRetina from 'leaflet/dist/images/marker-icon-2x.png';
 import iconMarker from 'leaflet/dist/images/marker-icon.png';
 import shadowUrlMarker from 'leaflet/dist/images/marker-shadow.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExpand, faCompress } from '@fortawesome/free-solid-svg-icons';
 
 import iconMarkerDark from './markers/marker-icon-black.png';
 
@@ -34,8 +38,10 @@ class MapWithTrace extends React.Component {
     points: PropTypes.arrayOf(PropTypes.any),
     positionSelected: PropTypes.any, // eslint-disable-line react/forbid-prop-types
     positionHovered: PropTypes.any, // eslint-disable-line react/forbid-prop-types
+    isFullScreen: PropTypes.bool,
 
     onSelectPosition: PropTypes.func,
+    onFullScreenClick: PropTypes.func,
 
     t: PropTypes.func.isRequired,
   };
@@ -44,8 +50,10 @@ class MapWithTrace extends React.Component {
     points: [],
     positionSelected: undefined,
     positionHovered: undefined,
+    isFullScreen: false,
 
     onSelectPosition: () => {},
+    onFullScreenClick: undefined,
   };
 
   constructor(props) {
@@ -53,6 +61,7 @@ class MapWithTrace extends React.Component {
 
     this.state = {
       positionSelected: props.positionSelected,
+      bounds: this.props.points,
     };
 
     this.dragHandler = this.dragHandler.bind(this);
@@ -62,6 +71,7 @@ class MapWithTrace extends React.Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       positionSelected: nextProps.positionSelected,
+      bounds: undefined,
     });
   }
 
@@ -126,13 +136,26 @@ class MapWithTrace extends React.Component {
         center={this.getCenterPoint()}
         maxZoom={19}
         className={style.map}
-        bounds={this.props.points}
+        bounds={this.state.bounds}
         boundsOptions={{ padding: [50, 50] }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution="&copy; OpenStreetMap contributors"
         />
+        <ScaleControl />
+        <Control position="topright">
+          {this.props.onFullScreenClick && (
+            <a
+              href="#"
+              onClick={this.props.onFullScreenClick}
+              role="button"
+              className={style.leafletButton}
+            >
+              <FontAwesomeIcon icon={this.props.isFullScreen ? faCompress : faExpand} />
+            </a>
+          )}
+        </Control>
         <Marker position={position} opacity={this.props.positionHovered ? 1 : 0.5}>
           <Popup>
             <div>

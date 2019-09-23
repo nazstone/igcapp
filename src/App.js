@@ -25,6 +25,7 @@ class App extends React.Component {
     ipcRenderer.on('saveFileResult', (event, arg) => {
       if (!arg.ok) {
         console.error(arg.err);
+        return;
       }
       this.setState((prSt) => {
         const tmp = prSt;

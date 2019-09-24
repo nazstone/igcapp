@@ -13,7 +13,6 @@ import {
   Highlight,
 } from 'react-vis';
 
-
 class Flat extends React.Component {
     static propTypes = {
       t: PropTypes.func.isRequired,
@@ -46,13 +45,45 @@ class Flat extends React.Component {
       this.mousePositionHandler = this.mousePositionHandler.bind(this);
       this.generateTooltipStyle = this.generateTooltipStyle.bind(this);
 
-      this.brush = false;
-
       this.state = {
         gpsVisibility: true,
         pressVisibility: true,
         areaFilter: null,
+        brush: false,
       };
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+      let nextState = {
+        ...prevState,
+      };
+      if (!nextProps.points) {
+        nextState = {
+          ...nextState,
+          points: nextProps.points,
+          pressAltData: [],
+          gpsAltData: [],
+        };
+      }
+      if (!prevState.points
+        || nextProps.points.length !== prevState.points.length
+      ) {
+        const pressAltData = nextProps.points.map((pt) => ({
+          x: pt.time.t,
+          y: pt.pressalt,
+        }));
+        const gpsAltData = nextProps.points.map((pt) => ({
+          x: pt.time.t,
+          y: pt.gpsalt,
+        }));
+        nextState = {
+          ...nextState,
+          pressAltData,
+          gpsAltData,
+          points: nextProps.points,
+        };
+      }
+      return nextState;
     }
 
     mouseMoveHandler(index) {
@@ -68,8 +99,10 @@ class Flat extends React.Component {
     }
 
     clickHandler(event) {
-      if (this.brush) {
-        this.brush = false;
+      if (this.state.brush) {
+        this.setState({
+          brush: false,
+        });
         return;
       }
       if (event.button === 0) {
@@ -143,14 +176,7 @@ class Flat extends React.Component {
     }
 
     render() {
-      const pressAltData = this.props.points.map((pt) => ({
-        x: pt.time.t,
-        y: pt.pressalt,
-      }));
-      const gpsAltData = this.props.points.map((pt) => ({
-        x: pt.time.t,
-        y: pt.gpsalt,
-      }));
+      const { pressAltData, gpsAltData } = this.state;
       const pressAltHoveredPoint = {
         x: this.state.pointHover ? this.state.pointHover.time.t : 0,
         y: this.state.pointHover ? this.state.pointHover.pressalt : 0,
@@ -248,7 +274,7 @@ class Flat extends React.Component {
                 stroke={this.gpsColor}
                 strokeWidth="2px"
                 style={{ fill: 'none' }}
-                onNearestX={(value, { index }) => { this.mouseMoveHandler(index); }}
+                onNearestX={this.state.pressVisibility ? ((value, { index }) => { this.mouseMoveHandler(index); }) : () => {}}
               />
             )}
 
@@ -281,7 +307,7 @@ class Flat extends React.Component {
             )}
 
             {/* Tooltip */}
-            {this.state.pointHover && (
+            {!this.state.brush && this.state.pointHover && (
               <Crosshair
                 values={hoveredPoint}
               >
@@ -297,9 +323,15 @@ class Flat extends React.Component {
             )}
 
             <Highlight
+              onBrush={() => {
+                if (!this.state.brush) {
+                  this.setState({
+                    brush: true,
+                  });
+                }
+              }}
               onBrushEnd={(e) => {
-                if (e) this.brush = true;
-                else return;
+                if (!e) return;
                 this.setState({ areaFilter: e });
               }}
             />

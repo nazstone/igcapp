@@ -34,7 +34,7 @@ class Header extends React.Component {
     t: PropTypes.func.isRequired,
     principal: PropTypes.oneOf([MAP, PLOT]),
 
-    saveDisplay: PropTypes.func,
+    saveDisplay: PropTypes.bool,
     saveAction: PropTypes.func,
     saveHide: PropTypes.func,
     switchPrincipal: PropTypes.func,
@@ -43,7 +43,7 @@ class Header extends React.Component {
   static defaultProps = {
     principal: undefined,
 
-    saveDisplay: () => {},
+    saveDisplay: false,
     saveAction: () => {},
     saveHide: () => {},
     switchPrincipal: () => {},

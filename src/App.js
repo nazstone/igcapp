@@ -127,7 +127,7 @@ class App extends React.Component {
     return (
       <div className={style.App}>
         <Header
-          principal={this.state.principal}
+          principal={!this.state.mapFullScreen && this.state.principal}
           saveAction={() => {
             console.log('saving data', {
               date: trace.data.metadata.date,

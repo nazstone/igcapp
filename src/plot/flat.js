@@ -32,9 +32,13 @@ class Flat extends React.Component {
       onClick: () => {},
     }
 
+    static ratioAltSpeed = 0.5;
+
     pressColor = 'rgba(204,255,204,1)';
 
     gpsColor = 'rgba(75,192,192,0.4)';
+
+    speedColor = 'rgba(215,15,22,0.2)';
 
     constructor(props) {
       super(props);
@@ -48,6 +52,7 @@ class Flat extends React.Component {
       this.state = {
         gpsVisibility: true,
         pressVisibility: true,
+        speedVisibility: true,
         areaFilter: null,
         brush: false,
       };
@@ -63,6 +68,8 @@ class Flat extends React.Component {
           points: nextProps.points,
           pressAltData: [],
           gpsAltData: [],
+          speedData: [],
+          speedScale: 0.8,
         };
       }
       if (!prevState.points
@@ -76,14 +83,47 @@ class Flat extends React.Component {
           x: pt.time.t,
           y: pt.gpsalt,
         }));
+
+        const maxgpsalt = nextProps.points
+          .map((x) => x.gpsalt)
+          .reduce((a, b) => (a > b ? a : b));
+        const maxpressalt = nextProps.points
+          .map((x) => x.pressalt)
+          .reduce((a, b) => (a > b ? a : b));
+        const maxspeed = nextProps.points
+          .map((x) => x.speed)
+          .reduce((a, b) => (a > b ? a : b));
+        const maxalt = maxgpsalt > maxpressalt ? maxgpsalt : maxpressalt;
+        const speedScale = (Flat.ratioAltSpeed * maxalt) / maxspeed;
+
+        const speedData = nextProps.points.map((pt) => ({
+          x: pt.time.t,
+          y: pt.speed * speedScale,
+        }));
         nextState = {
           ...nextState,
           pressAltData,
           gpsAltData,
+          speedData,
+          speedScale,
           points: nextProps.points,
         };
       }
       return nextState;
+    }
+
+    getSpeedScale(points) {
+      const maxgpsalt = points
+        .map((x) => x.gpsalt)
+        .reduce((a, b) => (a > b ? a : b));
+      const maxpressalt = points
+        .map((x) => x.pressalt)
+        .reduce((a, b) => (a > b ? a : b));
+      const maxspeed = points
+        .map((x) => x.speed)
+        .reduce((a, b) => (a > b ? a : b));
+      const maxalt = maxgpsalt > maxpressalt ? maxgpsalt : maxpressalt;
+      return (0.8 * maxalt) / maxspeed;
     }
 
     mouseMoveHandler(index) {
@@ -127,6 +167,12 @@ class Flat extends React.Component {
         this.setState((prSt) => ({
           ...prSt,
           gpsVisibility: !prSt.gpsVisibility,
+        }));
+      }
+      if (index === 2) {
+        this.setState((prSt) => ({
+          ...prSt,
+          speedVisibility: !prSt.speedVisibility,
         }));
       }
     }
@@ -176,7 +222,7 @@ class Flat extends React.Component {
     }
 
     render() {
-      const { pressAltData, gpsAltData } = this.state;
+      const { pressAltData, gpsAltData, speedData } = this.state;
       const pressAltHoveredPoint = {
         x: this.state.pointHover ? this.state.pointHover.time.t : 0,
         y: this.state.pointHover ? this.state.pointHover.pressalt : 0,
@@ -185,7 +231,11 @@ class Flat extends React.Component {
         x: this.state.pointHover ? this.state.pointHover.time.t : 0,
         y: this.state.pointHover ? this.state.pointHover.gpsalt : 0,
       };
-      const hoveredPoint = [pressAltHoveredPoint, gpsAltHoveredPoint];
+      const speedHoveredPoint = {
+        x: this.state.pointHover ? this.state.pointHover.time.t : 0,
+        y: this.state.pointHover ? this.state.pointHover.speed * this.state.speedScale : 0,
+      };
+      const hoveredPoint = [pressAltHoveredPoint, gpsAltHoveredPoint, speedHoveredPoint];
       const selectedPoint = [];
       if (this.state.pressVisibility) {
         selectedPoint.push({
@@ -197,6 +247,14 @@ class Flat extends React.Component {
         selectedPoint.push({
           x: this.props.positionSelected ? this.props.positionSelected.time.t : 0,
           y: this.props.positionSelected ? this.props.positionSelected.gpsalt : 0,
+        });
+      }
+      if (this.state.speedVisibility) {
+        selectedPoint.push({
+          x: this.props.positionSelected ? this.props.positionSelected.time.t : 0,
+          y: this.props.positionSelected
+            ? this.props.positionSelected.speed * this.state.speedScale
+            : 0,
         });
       }
 
@@ -217,7 +275,7 @@ class Flat extends React.Component {
         >
           <DiscreteColorLegend
             style={{
-              position: 'fixed', top: '60', right: '0', marginRight: '15px', marginTop: '15px', display: 'flex', flexDirection: 'column',
+              position: 'fixed', top: '60', right: '0', marginRight: '15px', marginTop: '15px', display: 'flex', flexDirection: 'column', fontSize: '10pt',
             }}
             items={[
               {
@@ -230,6 +288,11 @@ class Flat extends React.Component {
                 color: this.gpsColor,
                 strokeWidth: 2,
                 disabled: !this.state.gpsVisibility,
+              }, {
+                title: this.props.t('plot_speed'),
+                color: this.speedColor,
+                strokeWidth: 2,
+                disabled: !this.state.speedVisibility,
               },
             ]}
             onItemClick={this.legendsClickHandler}
@@ -254,11 +317,12 @@ class Flat extends React.Component {
               tickFormat={(value) => this.formatTime(value)}
               style={styleAxis}
             />
-            <YAxis
-              tickSize={3}
-              style={styleAxis}
-            />
-
+            {(this.state.gpsVisibility || this.state.pressVisibility) && (
+              <YAxis
+                tickSize={3}
+                style={styleAxis}
+              />
+            )}
             {this.state.pressVisibility && (
               <LineSeries
                 data={pressAltData}
@@ -274,7 +338,24 @@ class Flat extends React.Component {
                 stroke={this.gpsColor}
                 strokeWidth="2px"
                 style={{ fill: 'none' }}
-                onNearestX={this.state.pressVisibility ? ((value, { index }) => { this.mouseMoveHandler(index); }) : () => {}}
+                onNearestX={
+                  !this.state.pressVisibility
+                    ? ((value, { index }) => { this.mouseMoveHandler(index); })
+                    : () => {}
+                }
+              />
+            )}
+            {this.state.speedVisibility && (
+              <LineSeries
+                data={speedData}
+                stroke={this.speedColor}
+                strokeWidth="2px"
+                style={{ fill: 'none' }}
+                onNearestX={
+                  !this.state.pressVisibility && !this.state.gpsVisibility
+                    ? ((value, { index }) => { this.mouseMoveHandler(index); })
+                    : () => {}
+                }
               />
             )}
 
@@ -295,6 +376,14 @@ class Flat extends React.Component {
                 size="4"
               />
             )}
+            {this.state.speedVisibility && this.state.pointHover && (
+              <MarkSeries
+                data={[speedHoveredPoint]}
+                fill={this.speedColor}
+                color="lightgray"
+                size="4"
+              />
+            )}
 
             {/* dots for selected point */}
             {this.props.positionSelected && (
@@ -303,6 +392,18 @@ class Flat extends React.Component {
                 fill="rgba(0,0,0,0.3)"
                 color="rgba(0,0,0,0.6)"
                 size="3"
+              />
+            )}
+
+            {/* speed axe */}
+            {this.state.speedVisibility && (
+              <YAxis
+                title={this.props.t('plot_speed')}
+                tickSize={this.state.gpsVisibility || this.state.pressVisibility ? 0 : 3}
+                style={styleAxis}
+                tickFormat={(value) => (value / this.state.speedScale).toFixed(0)}
+                left={this.state.gpsVisibility || this.state.pressVisibility ? 30 : 0}
+                hideLine={this.state.gpsVisibility || this.state.pressVisibility}
               />
             )}
 

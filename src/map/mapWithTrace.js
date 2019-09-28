@@ -15,7 +15,7 @@ import iconMarkerRetina from 'leaflet/dist/images/marker-icon-2x.png';
 import iconMarker from 'leaflet/dist/images/marker-icon.png';
 import shadowUrlMarker from 'leaflet/dist/images/marker-shadow.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExpand, faCompress } from '@fortawesome/free-solid-svg-icons';
+import { faExpand, faCompress, faCrosshairs } from '@fortawesome/free-solid-svg-icons';
 
 import iconMarkerDark from './markers/marker-icon-black.png';
 
@@ -68,6 +68,7 @@ class MapWithTrace extends React.Component {
     this.closestPoint = this.closestPoint.bind(this);
   }
 
+  // TODO change with getDerivedStateFromProps
   componentWillReceiveProps(nextProps) {
     this.setState({
       positionSelected: nextProps.positionSelected,
@@ -120,7 +121,7 @@ class MapWithTrace extends React.Component {
 
   render() {
     const position = this.props.positionHovered || this.props.points[0];
-    const { positionSelected } = this.state;
+    const { positionSelected, bounds } = this.state;
 
     const myIcon = new L.Icon({
       iconUrl: iconMarkerDark,
@@ -136,7 +137,7 @@ class MapWithTrace extends React.Component {
         center={this.getCenterPoint()}
         maxZoom={19}
         className={style.map}
-        bounds={this.state.bounds}
+        bounds={bounds}
         boundsOptions={{ padding: [50, 50] }}
       >
         <TileLayer
@@ -144,7 +145,7 @@ class MapWithTrace extends React.Component {
           attribution="&copy; OpenStreetMap contributors"
         />
         <ScaleControl />
-        <Control position="topright">
+        <Control position="topright" className="leaflet-bar">
           {this.props.onFullScreenClick && (
             <a
               href="#"
@@ -155,6 +156,14 @@ class MapWithTrace extends React.Component {
               <FontAwesomeIcon icon={this.props.isFullScreen ? faCompress : faExpand} />
             </a>
           )}
+          <a
+            href="#"
+            onClick={() => this.setState({ bounds: this.props.points })}
+            role="button"
+            className={style.leafletButton}
+          >
+            <FontAwesomeIcon icon={faCrosshairs} />
+          </a>
         </Control>
         <Marker position={position} opacity={this.props.positionHovered ? 1 : 0.5}>
           <Popup>

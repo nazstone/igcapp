@@ -49,6 +49,7 @@ class App extends React.Component {
       this.setState((prevState) => ({
         ...prevState,
         trace: arg,
+        positionSelected: undefined,
       }));
     });
   }

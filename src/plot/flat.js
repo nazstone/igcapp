@@ -319,8 +319,15 @@ class Flat extends React.Component {
             />
             {(this.state.gpsVisibility || this.state.pressVisibility) && (
               <YAxis
+                title={this.props.t('plot_alt_axe')}
                 tickSize={3}
-                style={styleAxis}
+                style={{
+                  ...styleAxis,
+                  title: {
+                    transform: 'translateX(-5px)',
+                    fontSize: '10pt',
+                  },
+                }}
               />
             )}
             {this.state.pressVisibility && (
@@ -400,7 +407,13 @@ class Flat extends React.Component {
               <YAxis
                 title={this.props.t('plot_speed')}
                 tickSize={this.state.gpsVisibility || this.state.pressVisibility ? 0 : 3}
-                style={styleAxis}
+                style={{
+                  ...styleAxis,
+                  title: {
+                    transform: 'translateX(5px)',
+                    fontSize: '10pt',
+                  },
+                }}
                 tickFormat={(value) => (value / this.state.speedScale).toFixed(0)}
                 left={this.state.gpsVisibility || this.state.pressVisibility ? 30 : 0}
                 hideLine={this.state.gpsVisibility || this.state.pressVisibility}

@@ -21,6 +21,7 @@
     "metadata_pressure-sensor": "Pressure sensor",
     "search_column_date": "Date",
     "search_column_tag": "Tag",
+    "plot_alt_axe": "Alt.",
     "plot_pressalt": "Altitude (pression)",
     "plot_gpsalt": "Altitude (GPS)",
     "plot_time": "Time",

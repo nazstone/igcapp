@@ -29,8 +29,11 @@ const createWindow = async () => {
 
   // create browser
   mainWindow = new BrowserWindow({
-    width: windowsSize && windowsSize.width || 900,
-    height: windowsSize && windowsSize.height || 680,
+    icon: `${__dirname}/sugar-glider.png`,
+    width: (windowsSize && windowsSize.width) || 900,
+    height: (windowsSize && windowsSize.height) || 680,
+    frame: false,
+    titleBarStyle: 'hidden',
     webPreferences: {
       nodeIntegration: true,
     },
@@ -44,7 +47,7 @@ const createWindow = async () => {
     mainWindow.webContents.openDevTools();
   }
   mainWindow.on('resize', () => {
-    const { width, height, } = mainWindow.getBounds();
+    const { width, height } = mainWindow.getBounds();
     store.set('window_size', {
       width,
       height,
@@ -91,9 +94,9 @@ ipcMain.on('addIgcFileAsk', (event) => {
     ],
     properties: ['openFile'],
   }).then((d) => {
-    const path = d && d.filePaths && d.filePaths.length > 0 && d.filePaths[0];
+    const filePath = d && d.filePaths && d.filePaths.length > 0 && d.filePaths[0];
     openFile(event)({
-      path,
+      filePath,
     });
   });
 });

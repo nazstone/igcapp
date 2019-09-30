@@ -1,3 +1,4 @@
+
 import React, { Fragment } from 'react';
 
 import style from './App.module.scss';
@@ -8,6 +9,11 @@ import Info from './info';
 import Header from './header/header';
 
 import { MAP, PLOT } from './utils/constants';
+
+import icon from './sugar-glider.png';
+
+// eslint-disable-next-line no-undef
+const TitleBar = window.require('frameless-titlebar');
 
 // eslint-disable-next-line no-undef
 const { ipcRenderer } = window.require('electron');
@@ -49,6 +55,7 @@ class App extends React.Component {
       this.setState((prevState) => ({
         ...prevState,
         trace: arg,
+        positionSelected: undefined,
       }));
     });
   }
@@ -126,6 +133,20 @@ class App extends React.Component {
 
     return (
       <div className={style.App}>
+        <TitleBar>
+          <img
+            src={icon}
+            style={{
+              position: 'absolute',
+              top: '4px',
+              left: '4px',
+              width: '20px',
+              height: '20px',
+            }}
+            alt=""
+          />
+          <span> Sugar Glider</span>
+        </TitleBar>
         <Header
           principal={!this.state.mapFullScreen && this.state.principal}
           saveAction={() => {

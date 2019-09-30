@@ -68,27 +68,43 @@ class MapWithTrace extends React.Component {
     this.closestPoint = this.closestPoint.bind(this);
   }
 
-  // TODO change with getDerivedStateFromProps
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      positionSelected: nextProps.positionSelected,
-      bounds: undefined,
-    });
+  static getDerivedStateFromProps(nextProps, prevState) {
+    let nextState;
+    if (!prevState.points
+      || nextProps.points.length !== prevState.points.length
+      || prevState.recenter
+    ) {
+      nextState = {
+        ...prevState,
+        points: nextProps.points,
+        bounds: nextProps.points,
+        center: MapWithTrace.getCenterPoint(nextProps.points),
+        recenter: false,
+      };
+    } else {
+      nextState = {
+        ...prevState,
+        bounds: undefined,
+        center: undefined,
+      };
+    }
+    nextState.positionSelected = nextProps.positionSelected;
+    return nextState;
   }
 
 
-  getCenterPoint() {
-    const minLat = this.props.points.reduce(
+  static getCenterPoint(points) {
+    const minLat = points.reduce(
       (min, p) => (p.lat < min ? p.lat : min), Number.MAX_VALUE,
     );
-    const minLng = this.props.points.reduce(
+    const minLng = points.reduce(
       (min, p) => (p.lng < min ? p.lng : min), Number.MAX_VALUE,
     );
 
-    const maxLat = this.props.points.reduce(
+    const maxLat = points.reduce(
       (max, p) => (p.lat > max ? p.lat : max), Number.MIN_VALUE,
     );
-    const maxLng = this.props.points.reduce(
+    const maxLng = points.reduce(
       (max, p) => (p.lng > max ? p.lng : max), Number.MIN_VALUE,
     );
 
@@ -120,8 +136,8 @@ class MapWithTrace extends React.Component {
   }
 
   render() {
-    const position = this.props.positionHovered || this.props.points[0];
-    const { positionSelected, bounds } = this.state;
+    const position = this.props.positionHovered || this.state.points[0];
+    const { positionSelected, bounds, center } = this.state;
 
     const myIcon = new L.Icon({
       iconUrl: iconMarkerDark,
@@ -134,7 +150,7 @@ class MapWithTrace extends React.Component {
 
     return (
       <Map
-        center={this.getCenterPoint()}
+        center={center}
         maxZoom={19}
         className={style.map}
         bounds={bounds}
@@ -158,7 +174,7 @@ class MapWithTrace extends React.Component {
           )}
           <a
             href="#"
-            onClick={() => this.setState({ bounds: this.props.points })}
+            onClick={() => this.setState({ recenter: true })}
             role="button"
             className={style.leafletButton}
           >
@@ -199,7 +215,7 @@ class MapWithTrace extends React.Component {
         }
         <Polyline
           color="rgba(30,144,255,0.55)"
-          positions={this.props.points}
+          positions={this.state.points}
           onClick={(e) => this.props.onSelectPosition(this.closestPoint(e.latlng))}
         />
       </Map>

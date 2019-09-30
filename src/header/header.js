@@ -83,8 +83,6 @@ class Header extends React.Component {
 
     return (
       <Navbar color="light" light expand="lg" className={style.bar}>
-        <FontAwesomeIcon icon={faPaperPlane} size="lg" />
-        <NavbarBrand href="#" className={style.title}>{t('header_title')}</NavbarBrand>
         <Nav className="ml-auto">
           {
             saveDisplay

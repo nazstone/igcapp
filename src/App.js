@@ -8,9 +8,15 @@ import MapWithTrace from './map/mapWithTrace';
 import Info from './info';
 import Header from './header/header';
 
-import { MAP, PLOT } from './utils/constants';
+import {
+  MAP,
+  PLOT,
+  D2,
+  D3,
+} from './utils/constants';
 
 import icon from './sugar-glider.png';
+import Plot3d from './plot/plot3d';
 
 // eslint-disable-next-line no-undef
 const TitleBar = window.require('frameless-titlebar');
@@ -27,6 +33,7 @@ class App extends React.Component {
     this.state = {
       trace: null,
       principal: MAP,
+      plotType: D2,
       mapFullScreen: false,
     };
 
@@ -65,6 +72,11 @@ class App extends React.Component {
   }
 
   getPlot() {
+    if (this.state.plotType === D3) return this.get3dPlot();
+    return this.get2DPlot();
+  }
+
+  get2DPlot() {
     const { trace, positionSelected } = this.state;
     if (!trace || !trace.data || !trace.data.fixes) return (<Fragment />);
     return (
@@ -74,6 +86,17 @@ class App extends React.Component {
         positionSelected={positionSelected}
         onMouseHover={(data) => this.setState({ positionHovered: data })}
         onClick={(data) => this.setState({ positionSelected: data })}
+      />
+    );
+  }
+
+  get3dPlot() {
+    return (
+      <Plot3d
+        points={this.state.trace.data.fixes}
+        positionSelected={this.state.positionSelected}
+        onClick={(data) => this.setState({ positionSelected: data })}
+        field="pressalt"
       />
     );
   }
@@ -149,6 +172,7 @@ class App extends React.Component {
         </TitleBar>
         <Header
           principal={!this.state.mapFullScreen && this.state.principal}
+          plotType={!this.state.mapFullScreen && this.state.plotType}
           saveAction={() => {
             console.log('saving data', {
               date: trace.data.metadata.date,
@@ -177,6 +201,11 @@ class App extends React.Component {
             if (this.state.principal === MAP) this.setState({ principal: PLOT });
             else if (this.state.principal === PLOT) this.setState({ principal: MAP });
             else this.setState({ principal: undefined });
+          }}
+          switchPlotType={() => {
+            if (this.state.plotType === D2) this.setState({ plotType: D3 });
+            else if (this.state.plotType === D3) this.setState({ plotType: D2 });
+            else this.setState({ plotType: undefined });
           }}
         />
         {

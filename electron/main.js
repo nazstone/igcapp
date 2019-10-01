@@ -13,7 +13,7 @@ const {
   traceById,
   openFile,
   getLast,
-  saveTrace,  
+  saveTrace,
 } = require('./ipc');
 
 const { start } = require('./db/repo');

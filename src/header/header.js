@@ -15,14 +15,20 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPlusCircle,
   faSearch,
-  faPaperPlane,
   faCheckCircle,
   faTimesCircle,
   faChartLine,
   faMapMarked,
+  faCube,
+  faHamburger,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { MAP, PLOT } from '../utils/constants';
+import {
+  MAP,
+  PLOT,
+  D2,
+  D3,
+} from '../utils/constants';
 import style from './header.module.scss';
 import SearchTrace from './search/search.trace';
 
@@ -33,20 +39,24 @@ class Header extends React.Component {
   static propTypes = {
     t: PropTypes.func.isRequired,
     principal: PropTypes.oneOf([MAP, PLOT]),
+    plotType: PropTypes.oneOf([D2, D3]),
 
     saveDisplay: PropTypes.bool,
     saveAction: PropTypes.func,
     saveHide: PropTypes.func,
     switchPrincipal: PropTypes.func,
+    switchPlotType: PropTypes.func,
   };
 
   static defaultProps = {
     principal: undefined,
+    plotType: undefined,
 
     saveDisplay: false,
     saveAction: () => {},
     saveHide: () => {},
     switchPrincipal: () => {},
+    switchPlotType: () => {},
   };
 
   constructor(props) {
@@ -109,9 +119,23 @@ class Header extends React.Component {
             )
           }
           {
+            this.props.plotType && (
+              <NavItem>
+                <NavLink href="#">
+                  {this.props.plotType === D2 && (
+                    <FontAwesomeIcon icon={faCube} onClick={this.props.switchPlotType} size="lg" />
+                  )}
+                  {this.props.plotType === D3 && (
+                    <FontAwesomeIcon icon={faHamburger} onClick={this.props.switchPlotType} size="lg" />
+                  )}
+                </NavLink>
+              </NavItem>
+            )
+          }
+          {
             this.props.principal && (
               <NavItem>
-                <NavLink href="#" >
+                <NavLink href="#">
                   {this.props.principal === MAP && (
                     <FontAwesomeIcon icon={faChartLine} onClick={this.props.switchPrincipal} size="lg" />
                   )}

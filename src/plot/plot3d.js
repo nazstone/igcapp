@@ -147,8 +147,6 @@ export default class Plot3d extends Component {
 
     const layout = {
       autosize: true,
-      width: '100%',
-      height: '100%',
       margin: {
         l: 0,
         r: 0,
@@ -190,6 +188,7 @@ export default class Plot3d extends Component {
     };
     return (
       <PlotlyComponent
+        autosize
         data={this.state.data}
         layout={layout}
         config={{ showSendToCloud: false, displayModeBar: false }}

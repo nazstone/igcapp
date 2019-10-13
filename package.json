@@ -1,5 +1,5 @@
 {
-	"name": "igcapp",
+	"name": "SugarGlider",
 	"version": "1.0.0",
 	"description": "Desktop application for viewing IGC format track (for glider)",
 	"main": "electron/main.js",
@@ -81,7 +81,7 @@
 	},
 	"build": {
 		"appId": "org.nazstone",
-		"productName": "IGCApp",
+		"productName": "SugarGlider",
 		"copyright": "Copyright © 2019 ${author}",
 		"mac": {
 			"category": "public.app-category.utilities"

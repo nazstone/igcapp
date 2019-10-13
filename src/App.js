@@ -1,5 +1,6 @@
-
 import React, { Fragment } from 'react';
+import { withTranslation } from 'react-i18next';
+import PropTypes from 'prop-types';
 
 import style from './App.module.scss';
 
@@ -26,6 +27,10 @@ const { ipcRenderer } = window.require('electron');
 
 
 class App extends React.Component {
+  static propTypes = {
+    t: PropTypes.func.isRequired,
+  }
+
   constructor(props) {
     super(props);
 
@@ -159,16 +164,10 @@ class App extends React.Component {
         <TitleBar>
           <img
             src={icon}
-            style={{
-              position: 'absolute',
-              top: '4px',
-              left: '4px',
-              width: '20px',
-              height: '20px',
-            }}
+            className={style.icon}
             alt=""
           />
-          <span> Sugar Glider</span>
+          <span>{this.props.t('header_title')}</span>
         </TitleBar>
         <Header
           principal={!this.state.mapFullScreen && this.state.principal}
@@ -241,4 +240,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default withTranslation()(App);

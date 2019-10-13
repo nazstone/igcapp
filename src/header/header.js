@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { withTranslation } from 'react-i18next';
 import {
   Navbar,
-  NavbarBrand,
   Nav,
   NavItem,
   NavLink,
@@ -20,7 +19,7 @@ import {
   faChartLine,
   faMapMarked,
   faCube,
-  faHamburger,
+  faSquare,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -126,7 +125,7 @@ class Header extends React.Component {
                     <FontAwesomeIcon icon={faCube} onClick={this.props.switchPlotType} size="lg" />
                   )}
                   {this.props.plotType === D3 && (
-                    <FontAwesomeIcon icon={faHamburger} onClick={this.props.switchPlotType} size="lg" />
+                    <FontAwesomeIcon icon={faSquare} onClick={this.props.switchPlotType} size="lg" />
                   )}
                 </NavLink>
               </NavItem>

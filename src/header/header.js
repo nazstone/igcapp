@@ -6,88 +6,31 @@ import {
   Nav,
   NavItem,
   NavLink,
-  Modal,
-  ModalBody,
-  ModalHeader,
 } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faPlusCircle,
-  faSearch,
   faCheckCircle,
   faTimesCircle,
-  faChartLine,
-  faMapMarked,
-  faCube,
-  faSquare,
 } from '@fortawesome/free-solid-svg-icons';
 
-import {
-  MAP,
-  PLOT,
-  D2,
-  D3,
-} from '../utils/constants';
 import style from './header.module.scss';
-import SearchTrace from './search/search.trace';
-
-// eslint-disable-next-line no-undef
-const { ipcRenderer } = window.require('electron');
 
 class Header extends React.Component {
   static propTypes = {
-    t: PropTypes.func.isRequired,
-    principal: PropTypes.oneOf([MAP, PLOT]),
-    plotType: PropTypes.oneOf([D2, D3]),
-
     saveDisplay: PropTypes.bool,
     saveAction: PropTypes.func,
     saveHide: PropTypes.func,
-    switchPrincipal: PropTypes.func,
-    switchPlotType: PropTypes.func,
   };
 
   static defaultProps = {
-    principal: undefined,
-    plotType: undefined,
-
     saveDisplay: false,
     saveAction: () => {},
     saveHide: () => {},
-    switchPrincipal: () => {},
-    switchPlotType: () => {},
   };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      searchOpen: false,
-    };
-  }
-
-  addTraceClick() {
-    ipcRenderer.send('addIgcFileAsk');
-  }
-
-  searchDisplayModal() {
-    this.setState((pvSt) => ({
-      ...pvSt,
-      resultDisplay: true,
-    }));
-  }
-
-  searchHideModal() {
-    this.setState((pvSt) => ({
-      ...pvSt,
-      resultDisplay: false,
-    }));
-  }
-
 
   render() {
     const {
-      t, saveDisplay, saveAction, saveHide,
+      saveDisplay, saveAction, saveHide,
     } = this.props;
 
     return (
@@ -117,51 +60,7 @@ class Header extends React.Component {
             </NavItem>
             )
           }
-          {
-            this.props.plotType && (
-              <NavItem>
-                <NavLink href="#">
-                  {this.props.plotType === D2 && (
-                    <FontAwesomeIcon icon={faCube} onClick={this.props.switchPlotType} size="lg" />
-                  )}
-                  {this.props.plotType === D3 && (
-                    <FontAwesomeIcon icon={faSquare} onClick={this.props.switchPlotType} size="lg" />
-                  )}
-                </NavLink>
-              </NavItem>
-            )
-          }
-          {
-            this.props.principal && (
-              <NavItem>
-                <NavLink href="#">
-                  {this.props.principal === MAP && (
-                    <FontAwesomeIcon icon={faChartLine} onClick={this.props.switchPrincipal} size="lg" />
-                  )}
-                  {this.props.principal === PLOT && (
-                    <FontAwesomeIcon icon={faMapMarked} onClick={this.props.switchPrincipal} size="lg" />
-                  )}
-                </NavLink>
-              </NavItem>
-            )
-          }
-          <NavItem>
-            <NavLink href="#" onClick={() => this.addTraceClick()}>
-              <FontAwesomeIcon icon={faPlusCircle} size="lg" />
-            </NavLink>
-          </NavItem>
-          <NavItem>
-            <NavLink href="#">
-              <FontAwesomeIcon icon={faSearch} size="lg" onClick={() => this.searchDisplayModal()} />
-            </NavLink>
-          </NavItem>
         </Nav>
-        <Modal isOpen={this.state.resultDisplay} backdrop toggle={() => this.searchHideModal()}>
-          <ModalHeader toggle={() => this.searchHideModal()}>{t('header_title_search')}</ModalHeader>
-          <ModalBody>
-            <SearchTrace hide={() => this.searchHideModal()} />
-          </ModalBody>
-        </Modal>
       </Navbar>
     );
   }

@@ -15,7 +15,7 @@ import iconMarkerRetina from 'leaflet/dist/images/marker-icon-2x.png';
 import iconMarker from 'leaflet/dist/images/marker-icon.png';
 import shadowUrlMarker from 'leaflet/dist/images/marker-shadow.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExpand, faCompress, faCrosshairs } from '@fortawesome/free-solid-svg-icons';
+import { faExpand, faCompress, faCrosshairs, faExchangeAlt } from '@fortawesome/free-solid-svg-icons';
 
 import iconMarkerDark from './markers/marker-icon-black.png';
 
@@ -42,6 +42,7 @@ class MapWithTrace extends React.Component {
 
     onSelectPosition: PropTypes.func,
     onFullScreenClick: PropTypes.func,
+    onSwitchPrincipalClick: PropTypes.func,
 
     t: PropTypes.func.isRequired,
   };
@@ -54,6 +55,7 @@ class MapWithTrace extends React.Component {
 
     onSelectPosition: () => {},
     onFullScreenClick: undefined,
+    onSwitchPrincipalClick: () => {},
   };
 
   constructor(props) {
@@ -179,6 +181,14 @@ class MapWithTrace extends React.Component {
             className={style.leafletButton}
           >
             <FontAwesomeIcon icon={faCrosshairs} />
+          </a>
+          <a
+            href="#"
+            onClick={() => this.props.onSwitchPrincipalClick()}
+            role="button"
+            className={style.leafletButton}
+          >
+            <FontAwesomeIcon icon={faExchangeAlt} />
           </a>
         </Control>
         <Marker position={position} opacity={this.props.positionHovered ? 1 : 0.5}>

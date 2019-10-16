@@ -96,7 +96,7 @@ ipcMain.on('addIgcFileAsk', (event) => {
   }).then((d) => {
     const filePath = d && d.filePaths && d.filePaths.length > 0 && d.filePaths[0];
     openFile(event)({
-      filePath,
+      path: filePath,
     });
   });
 });

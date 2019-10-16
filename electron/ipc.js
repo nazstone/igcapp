@@ -16,15 +16,15 @@ const {
   removeTag,
 } = require('./db/repo');
 
-const returnAnalyze = (filePath, lastData, event, dbTrace) => {
+const returnAnalyze = (filePath, event, dbTrace) => {
   try {
     const igcData = fs.readFileSync(filePath);
     const filename = path.basename(filePath);
     const analyzer = new IGCAnalyzer(igcData);
-    lastData = analyzer.parse(true, true);
+    const lastData = analyzer.parse(true, true);
     event.reply('openFileFinish', {
       path: filePath,
-      filename: filename,
+      filename,
       data: lastData,
       hash: sha1(igcData),
       dbTrace,
@@ -59,7 +59,6 @@ const openFile = (event) => {
   /** data is a object with path and traceId */
   return async ({ path, traceId }) => {
     // on result parse each file
-    let lastData;
     if (!path && !traceId) {
       event.reply('openFileErr', {
         err: 'empty filepath',
@@ -73,7 +72,7 @@ const openFile = (event) => {
       dbTrace = mapEntityToJson(result);
     }
 
-    returnAnalyze(path || dbTrace.path, lastData, event, dbTrace);
+    returnAnalyze(path || dbTrace.path, event, dbTrace);
     store.clear('last_file');
     store.set('last_file', {
       traceId,

@@ -131,7 +131,7 @@ class FlightSumup extends React.Component {
         )}
         <div className="line">
           <div className="title">{t('sumup_distance')}:</div>
-          <div>{Math.round(track.distance)}</div>
+          <div>{Math.round(track.distance).toLocaleString()} km</div>
         </div>
         {/* <div className="line">
           <div>Time: </div>
@@ -139,11 +139,11 @@ class FlightSumup extends React.Component {
         </div> */}
         <div className="line">
           <div className="title">{t('sumup_alt_max')}:</div>
-          <div>{track.maxaltitude}</div>
+          <div>{track.maxaltitude.toLocaleString()} m</div>
         </div>
         <div className="line">
           <div className="title">{t('sumup_alt_min')}:</div>
-          <div>{track.minaltitude}</div>
+          <div>{track.minaltitude.toLocaleString()} m</div>
         </div>
         {/* <div className="line">
           <div>Alt Average: </div>
